@@ -26,7 +26,7 @@ def makeDict(data, key, saveFile):
 		tokens.extend(line[key])
 	counter = collections.Counter(tokens)
 	count_pairs = sorted(counter.items(), key=lambda x: (-x[1], x[0]))
-	count_pairs.insert(0, [('<PAD>', 0)])
+	count_pairs.insert(0, ('<PAD>', 0))
 	f = open(saveFile, 'w')
 	for i in range(len(count_pairs)):
 		f.write(str(count_pairs[i][0]) + '\t' + str(i) + '\n')
@@ -43,8 +43,8 @@ def generateInput(data, saveFile):
 	f.close()
 
 data = splitFile('cpbtrain.txt')
-#makeDict(data, 'words', 'word2id')
-#makeDict(data, 'srs', 'label2id')
-generateInput(data, 'train.in')
-data = splitFile('cpbdev.txt')
-generateInput(data, 'validation.in')
+makeDict(data, 'words', 'word2id')
+makeDict(data, 'srs', 'label2id')
+#generateInput(data, 'train.in')
+#data = splitFile('cpbdev.txt')
+#generateInput(data, 'validation.in')
