@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 def getEmbedding(infile_path="embedding"):
-    char2id, id_char = loadMap("word2id")
+    char2id, id_char = loadMap("char2id")
     row_index = 0
     with open(infile_path, "rb") as infile:
         for row in infile:
@@ -184,12 +184,12 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
         y_val = y[int(num_samples * train_val_ratio):]
 
     print "train size: %d, validation size: %d" % (len(X_train), len(y_val))
-
+`
     return X_train, y_train, X_val, y_val
 
 
 def getTest(test_path="test.in", is_validation=False, seq_max_len=200):
-    char2id, id2char = loadMap("word2id")
+    char2id, id2char = loadMap("char2id")
     label2id, id2label = loadMap("label2id")
 
     df_test = pd.read_csv(test_path, delimiter='\t', quoting=csv.QUOTE_NONE, skip_blank_lines=False, header=None, names=["char", "label"])
