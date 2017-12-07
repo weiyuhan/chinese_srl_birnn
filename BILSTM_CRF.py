@@ -153,7 +153,7 @@ class BILSTM_CRF(object):
     def train(self, sess, save_file, X_train, y_train, X_val, y_val):
         saver = tf.train.Saver()
 
-        char2id, id2char = helper.loadMap("char2id")
+        char2id, id2char = helper.loadMap("word2id")
         label2id, id2label = helper.loadMap("label2id")
 
         merged = tf.summary.merge_all()
@@ -231,7 +231,7 @@ class BILSTM_CRF(object):
                         print "saved the best model with f1: %.5f" % (self.max_f1)
 
     def test(self, sess, X_test, X_test_str, output_path):
-        char2id, id2char = helper.loadMap("char2id")
+        char2id, id2char = helper.loadMap("word2id")
         label2id, id2label = helper.loadMap("label2id")
         num_iterations = int(math.ceil(1.0 * len(X_test) / self.batch_size))
         print "number of iteration: " + str(num_iterations)

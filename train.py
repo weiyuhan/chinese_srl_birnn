@@ -33,7 +33,7 @@ num_steps = 200 # it must consist with the test
 start_time = time.time()
 print "preparing train and validation data"
 X_train, y_train, X_val, y_val = helper.getTrain(train_path=train_path, val_path=val_path, seq_max_len=num_steps)
-char2id, id2char = helper.loadMap("char2id")
+char2id, id2char = helper.loadMap("word2id")
 label2id, id2label = helper.loadMap("label2id")
 print(len(X_train))
 num_chars = len(id2char.keys())
