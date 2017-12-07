@@ -297,8 +297,8 @@ class BILSTM_CRF(object):
             for t in range(len(y)):
                 if y[t] == y_hat[t]:
                     hit_num += 1 
-            pred_num += len(y_hat.split())
-            true_num += len(y.split())
+            pred_num += len(y_hat)
+            true_num += len(y)
         if pred_num != 0:
             precision = 1.0 * hit_num / pred_num
         if true_num != 0:
