@@ -117,40 +117,34 @@ class BILSTM_CRF(object):
         return x_max_ + tf.log(tf.reduce_sum(tf.exp(x - x_max), axis=axis))
 
     def forward(self, observations, transitions, length, is_viterbi=True, return_best_seq=True):
-        print(length.shape)
-	length = tf.reshape(length, [self.batch_size])
-        print(length.shape)
-	tmptensor = tf.concat(axis=0, values=[transitions] * self.batch_size)
-	print(transitions)
-	print(transitions.shape)
-	print(tmptensor.shape)
-	transitions = tf.reshape(tf.concat(axis=0, values=[transitions] * self.batch_size), [self.batch_size, 6, 6])
-        observations = tf.reshape(observations, [self.batch_size, self.num_steps + 2, 6, 1])
+        length = tf.reshape(length, [self.batch_size])
+        transitions = tf.reshape(tf.concat(axis=0, values=[transitions] * self.batch_size), [self.batch_size, self.num_classes + 1, self.num_classes + 1])
+        observations = tf.reshape(observations, [self.batch_size, self.num_steps + 2, self.num_classes + 1, 1])
         observations = tf.transpose(observations, [1, 0, 2, 3])
         previous = observations[0, :, :, :]
         max_scores = []
         max_scores_pre = []
         alphas = [previous]
         for t in range(1, self.num_steps + 2):
-            previous = tf.reshape(previous, [self.batch_size, 6, 1])
-            current = tf.reshape(observations[t, :, :, :], [self.batch_size, 1, 6])
+            previous = tf.reshape(previous, [self.batch_size, self.num_classes + 1, 1])
+            current = tf.reshape(observations[t, :, :, :], [self.batch_size, 1, self.num_classes + 1])
             alpha_t = previous + current + transitions
             if is_viterbi:
                 max_scores.append(tf.reduce_max(alpha_t, axis=1))
                 max_scores_pre.append(tf.argmax(alpha_t, axis=1))
-            alpha_t = tf.reshape(self.logsumexp(alpha_t, axis=1), [self.batch_size, 6, 1])
+            alpha_t = tf.reshape(self.logsumexp(alpha_t, axis=1), [self.batch_size, self.num_classes + 1, 1])
             alphas.append(alpha_t)
             previous = alpha_t           
             
-        alphas = tf.reshape(tf.concat(axis=0, values=alphas), [self.num_steps + 2, self.batch_size, 6, 1])
+        alphas = tf.reshape(tf.concat(axis=0, values=alphas), [self.num_steps + 2, self.batch_size, self.num_classes + 1, 1])
         alphas = tf.transpose(alphas, [1, 0, 2, 3])
-        alphas = tf.reshape(alphas, [self.batch_size * (self.num_steps + 2), 6, 1])
+        alphas = tf.reshape(alphas, [self.batch_size * (self.num_steps + 2), self.num_classes + 1, 1])
 
         last_alphas = tf.gather(alphas, tf.range(0, self.batch_size) * (self.num_steps + 2) + length)
-        last_alphas = tf.reshape(last_alphas, [self.batch_size, 6, 1])
+        last_alphas = tf.reshape(last_alphas, [self.batch_size, self.num_classes + 1, 1])
 
-        max_scores = tf.reshape(tf.concat(axis=0, values=max_scores), (self.num_steps + 1, self.batch_size, 6))
-        max_scores_pre = tf.reshape(tf.concat(axis=0, values=max_scores_pre), (self.num_steps + 1, self.batch_size, 6))
+        max_scores = tf.reshape(tf.concat(axis=0, values=max_scores), (self.num_steps + 1, self.batch_size, self.num_classes + 1))
+        max_scores_pre = tf.reshape(tf.concat(axis=0, values=max_scores_pre), (self.num_steps + 1, self.batch_size, self.num_classes + 1))
         max_scores = tf.transpose(max_scores, [1, 0, 2])
         max_scores_pre = tf.transpose(max_scores_pre, [1, 0, 2])
 
