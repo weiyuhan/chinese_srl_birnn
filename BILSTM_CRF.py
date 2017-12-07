@@ -10,7 +10,7 @@ class BILSTM_CRF(object):
         self.max_f1 = 0
         self.learning_rate = 0.002
         self.dropout_rate = 0.5
-        self.batch_size = 20
+        self.batch_size = 64
         self.num_layers = 1   
         self.emb_dim = 100
         self.hidden_dim = 100
