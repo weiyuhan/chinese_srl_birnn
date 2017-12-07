@@ -42,7 +42,6 @@ if emb_path != None:
 	embedding_matrix = helper.getEmbedding(emb_path)
 else:
 	embedding_matrix = None
-'''
 print "building model"
 config = tf.ConfigProto(allow_soft_placement=True)
 with tf.Session(config=config) as sess:
@@ -59,4 +58,3 @@ with tf.Session(config=config) as sess:
 
 		end_time = time.time()
 		print "time used %f(hour)" % ((end_time - start_time) / 3600)
-'''

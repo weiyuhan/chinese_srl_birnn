@@ -10,7 +10,7 @@ class BILSTM_CRF(object):
         self.max_f1 = 0
         self.learning_rate = 0.002
         self.dropout_rate = 0.5
-        self.batch_size = 128
+        self.batch_size = 20
         self.num_layers = 1   
         self.emb_dim = 100
         self.hidden_dim = 100
@@ -67,7 +67,7 @@ class BILSTM_CRF(object):
         self.logits = tf.matmul(self.outputs, self.softmax_w) + self.softmax_b
 
         if not is_crf:
-            pass
+            self.tags_scores = tf.reshape(self.logits, [self.batch_size, self.num_steps, self.num_classes])
         else:
             self.tags_scores = tf.reshape(self.logits, [self.batch_size, self.num_steps, self.num_classes])
             self.transitions = tf.get_variable("transitions", [self.num_classes + 1, self.num_classes + 1])
@@ -193,14 +193,14 @@ class BILSTM_CRF(object):
                     })
 
                 predicts_train = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
-                if iteration % 10 == 0:
+                if iteration % 10 == 0 or iteration == num_iterations - 1:
                     cnt += 1
                     precision_train, recall_train, f1_train = self.evaluate(X_train_batch, y_train_batch, predicts_train, id2char, id2label)
                     summary_writer_train.add_summary(train_summary, cnt)
                     print "iteration: %5d, train loss: %5d, train precision: %.5f, train recall: %.5f, train f1: %.5f" % (iteration, loss_train, precision_train, recall_train, f1_train)  
                     
                 # validation
-                if iteration % 100 == 0:
+                if iteration % 100 == 0 or iteration == num_iterations - 1:
                     X_val_batch, y_val_batch = helper.nextRandomBatch(X_val, y_val, batch_size=self.batch_size)
                     # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
                     transition_batch = helper.getTransition(y_val_batch)
@@ -291,14 +291,20 @@ class BILSTM_CRF(object):
         pred_num = 0
         true_num = 0
         for i in range(len(y_true)):
-            x = ''.join([str(id2char[val].encode("utf-8")) for val in X[i]])
-            y = ''.join([str(id2label[val].encode("utf-8")) for val in y_true[i]])
-            y_hat = ''.join([id2label[val] for val in y_pred[i]  if val != 5])
-            true_labels = helper.extractEntity(x, y)
-            pred_labels = helper.extractEntity(x, y_hat)
-            hit_num += len(set(true_labels) & set(pred_labels))
-            pred_num += len(set(pred_labels))
-            true_num += len(set(true_labels))
+            x = [str(id2char[val].encode("utf-8")) for val in X[i] if val != 0]
+            y = [str(id2label[val].encode("utf-8")) for val in y_true[i] if val != 0]
+            y_hat = [id2label[val].encode("utf-8") for val in y_pred[i] if val != 0]
+            print(x)
+            print(y)
+            print(y_hat)
+            print(len(x))
+            print(len(y))
+            print(len(y_hat))
+            for t in range(len(y)):
+                if y == y_hat:
+                    hit_num += 1 
+            pred_num += len(y_hat.split())
+            true_num += len(y.split())
         if pred_num != 0:
             precision = 1.0 * hit_num / pred_num
         if true_num != 0:
