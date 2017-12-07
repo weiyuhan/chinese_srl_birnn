@@ -184,7 +184,6 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
         y_val = y[int(num_samples * train_val_ratio):]
 
     print "train size: %d, validation size: %d" % (len(X_train), len(y_val))
-`
     return X_train, y_train, X_val, y_val
 
 

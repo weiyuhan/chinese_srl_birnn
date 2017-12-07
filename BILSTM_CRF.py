@@ -283,7 +283,7 @@ class BILSTM_CRF(object):
             results.append(entitys)
         return results
 
-    def evaluate(self, X, y_true, y_pred, id2char, id2label):
+    def evaluate(self, X, y_true, y_pred,id2char, id2label):
         precision = -1.0
         recall = -1.0
         f1 = -1.0
@@ -291,14 +291,16 @@ class BILSTM_CRF(object):
         pred_num = 0
         true_num = 0
         for i in range(len(y_true)):
-            x = [str(id2char[val].encode("utf-8")) for val in X[i] if val != 0]
-            y = [str(id2label[val].encode("utf-8")) for val in y_true[i] if val != 0]
-            y_hat = [str(id2label[val].encode("utf-8")) for val in y_pred[i] if val != 0]
-            for t in range(len(y)):
+            x = [str(id2char[val].encode("utf-8")) for val in X[i]]
+            y = [str(id2label[val].encode("utf-8")) for val in y_true[i]]
+            y_hat = [str(id2label[val].encode("utf-8")) for val in y_pred[i]]
+            for t in range(len(y_hat)):
                 if y[t] == y_hat[t]:
                     hit_num += 1 
-            pred_num += len(y_hat)
-            true_num += len(y)
+                if y_hat[t] != '<PAD>':
+                    pred_num += 1
+                if y[t] != '<PAD>':
+                    true_num += 1
         if pred_num != 0:
             precision = 1.0 * hit_num / pred_num
         if true_num != 0:
