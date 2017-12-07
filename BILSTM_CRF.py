@@ -22,7 +22,7 @@ class BILSTM_CRF(object):
         # placeholder of x, y and weight
         self.inputs = tf.placeholder(tf.int32, [None, self.num_steps])
         self.targets = tf.placeholder(tf.int32, [None, self.num_steps])
-        self.targets_weight = tf.placeholder(tf.float32, [None, self.num_steps])
+        # self.targets_weight = tf.placeholder(tf.float32, [None, self.num_steps])
         self.targets_transition = tf.placeholder(tf.int32, [None])
         
         # char embedding
@@ -173,7 +173,7 @@ class BILSTM_CRF(object):
             for iteration in range(num_iterations):
                 # train
                 X_train_batch, y_train_batch = helper.nextBatch(X_train, y_train, start_index=iteration * self.batch_size, batch_size=self.batch_size)
-                y_train_weight_batch = 1 + np.array((y_train_batch == label2id['B']) | (y_train_batch == label2id['E']), float)
+                # y_train_weight_batch = 1 + np.array((y_train_batch == label2id['B']) | (y_train_batch == label2id['E']), float)
                 transition_batch = helper.getTransition(y_train_batch)
                 
                 _, loss_train, max_scores, max_scores_pre, length, train_summary =\
@@ -188,8 +188,8 @@ class BILSTM_CRF(object):
                     feed_dict={
                         self.targets_transition:transition_batch, 
                         self.inputs:X_train_batch, 
-                        self.targets:y_train_batch, 
-                        self.targets_weight:y_train_weight_batch
+                        self.targets:y_train_batch 
+                        # self.targets_weight:y_train_weight_batch
                     })
 
                 predicts_train = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
@@ -202,7 +202,7 @@ class BILSTM_CRF(object):
                 # validation
                 if iteration % 100 == 0:
                     X_val_batch, y_val_batch = helper.nextRandomBatch(X_val, y_val, batch_size=self.batch_size)
-                    y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
+                    # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
                     transition_batch = helper.getTransition(y_val_batch)
                     
                     loss_val, max_scores, max_scores_pre, length, val_summary =\
@@ -216,8 +216,8 @@ class BILSTM_CRF(object):
                         feed_dict={
                             self.targets_transition:transition_batch, 
                             self.inputs:X_val_batch, 
-                            self.targets:y_val_batch, 
-                            self.targets_weight:y_val_weight_batch
+                            self.targets:y_val_batch 
+                            # self.targets_weight:y_val_weight_batch
                         })
                     
                     predicts_val = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
