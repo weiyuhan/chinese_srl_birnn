@@ -1,4 +1,5 @@
 import json
+import collections
 
 def splitFile(filename):
 	f = open(filename)
@@ -19,7 +20,31 @@ def splitFile(filename):
 		retLines.append({'words': words, 'poss': poss, 'srs': srs})
 	return retLines
 
+def makeDict(data, key, saveFile):
+	tokens = []
+	for line in data:
+		tokens.extend(line[key])
+	counter = collections.Counter(tokens)
+	count_pairs = sorted(counter.items(), key=lambda x: (-x[1], x[0]))
+	count_pairs.insert(0, [('<PAD>', 0)])
+	f = open(saveFile, 'w')
+	for i in range(len(count_pairs)):
+		f.write(str(count_pairs[i][0]) + '\t' + str(i) + '\n')
+	f.close()
+
+def generateInput(data, saveFile):
+	f = open(saveFile, 'w')
+	for line in data:
+		words = line['words']
+		srs = line['srs']
+		for i in range(len(words)):
+			f.write(words[i] + '\t' + srs[i] + '\n')
+		f.write('\n')
+	f.close()
+
+data = splitFile('cpbtrain.txt')
+#makeDict(data, 'words', 'word2id')
+#makeDict(data, 'srs', 'label2id')
+generateInput(data, 'train.in')
 data = splitFile('cpbdev.txt')
-file = open('dev.json', 'w')
-for line in data:
-	file.write(json.dumps(line) + '\n')
+generateInput(data, 'validation.in')

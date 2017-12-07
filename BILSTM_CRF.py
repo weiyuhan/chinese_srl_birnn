@@ -293,15 +293,9 @@ class BILSTM_CRF(object):
         for i in range(len(y_true)):
             x = [str(id2char[val].encode("utf-8")) for val in X[i] if val != 0]
             y = [str(id2label[val].encode("utf-8")) for val in y_true[i] if val != 0]
-            y_hat = [id2label[val].encode("utf-8") for val in y_pred[i] if val != 0]
-            print(x)
-            print(y)
-            print(y_hat)
-            print(len(x))
-            print(len(y))
-            print(len(y_hat))
+            y_hat = [str(id2label[val].encode("utf-8")) for val in y_pred[i] if val != 0]
             for t in range(len(y)):
-                if y == y_hat:
+                if y[t] == y_hat[t]:
                     hit_num += 1 
             pred_num += len(y_hat.split())
             true_num += len(y.split())
