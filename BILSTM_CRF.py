@@ -348,6 +348,7 @@ class BILSTM_CRF(object):
                 if y_hat[t] != '<PAD>' and y_hat[t] != 'O':
                     pred_num += 1
                 if y[t] != '<PAD>' and y[t] != 'O':
+                    true_num +=1 
         return hit_num, pred_num, true_num  
 
     def caculate(self, hit_num, pred_num, true_num):
