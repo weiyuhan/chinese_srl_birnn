@@ -193,14 +193,14 @@ class BILSTM_CRF(object):
                     })
 
                 predicts_train = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
-                if iteration % 10 == 0 or iteration == num_iterations - 1:
+                if iteration > 0 and iteration % 10 == 0:
                     cnt += 1
                     precision_train, recall_train, f1_train = self.evaluate(X_train_batch, y_train_batch, predicts_train, id2char, id2label)
                     summary_writer_train.add_summary(train_summary, cnt)
                     print "iteration: %5d, train loss: %5d, train precision: %.5f, train recall: %.5f, train f1: %.5f" % (iteration, loss_train, precision_train, recall_train, f1_train)  
                     
                 # validation
-                if iteration % 100 == 0 or iteration == num_iterations - 1:
+                if iteration > 0 and iteration % 100 == 0:
                     X_val_batch, y_val_batch = helper.nextRandomBatch(X_val, y_val, batch_size=self.batch_size)
                     # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
                     transition_batch = helper.getTransition(y_val_batch)
@@ -229,6 +229,39 @@ class BILSTM_CRF(object):
                         self.max_f1 = f1_val
                         save_path = saver.save(sess, save_file)
                         print "saved the best model with f1: %.5f" % (self.max_f1)
+
+                if iteration == num_iterations -1:
+                    num_val_iterations = int(math.ceil(1.0 * len(X_val) / self.batch_size))
+                    precision_val = 0
+                    recall_val = 0
+                    f1_val = 0
+                    for val_iteration in range(num_val_iterations):
+                        X_val_batch, y_val_batch = helper.nextBatch(X_val, y_val, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
+                        # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
+                        transition_batch = helper.getTransition(y_val_batch)
+                        loss_val, max_scores, max_scores_pre, length, val_summary =\
+                            sess.run([
+                                self.loss, 
+                                self.max_scores, 
+                                self.max_scores_pre, 
+                                self.length,
+                                self.val_summary
+                            ], 
+                            feed_dict={
+                                self.targets_transition:transition_batch, 
+                                self.inputs:X_val_batch, 
+                                self.targets:y_val_batch 
+                                # self.targets_weight:y_val_weight_batch
+                            })
+                    
+                        predicts_val = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
+                        i_precision_val, i_recall_val, i_f1_val = self.evaluate(X_val_batch, y_val_batch, predicts_val, id2char, id2label)
+                        precision_val += i_precision_val
+                        recall_val += i_recall_val
+                        f1_val += i_f1_val
+                    print "valid precision: %.5f, valid recall: %.5f, valid f1: %.5f" % (precision_val/num_val_iterations, recall_val/num_val_iterations, f1_val/num_val_iterations)
+
+
 
     def test(self, sess, X_test, X_test_str, output_path):
         char2id, id2char = helper.loadMap("char2id")
@@ -295,11 +328,11 @@ class BILSTM_CRF(object):
             y = [str(id2label[val].encode("utf-8")) for val in y_true[i]]
             y_hat = [str(id2label[val].encode("utf-8")) for val in y_pred[i]]
             for t in range(len(y_hat)):
-                if y[t] == y_hat[t]:
+                if y[t] == y_hat[t] and y_hat[t] != 'O':
                     hit_num += 1 
-                if y_hat[t] != '<PAD>':
+                if y_hat[t] != '<PAD>' and y_hat[t] != 'O':
                     pred_num += 1
-                if y[t] != '<PAD>':
+                if y[t] != '<PAD>' and y[t] != 'O':
                     true_num += 1
         if pred_num != 0:
             precision = 1.0 * hit_num / pred_num
