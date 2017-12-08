@@ -70,7 +70,7 @@ def prepare(chars, poss, labels, seq_max_len, is_padding=True):
     tmp_pos = []
     tmp_y = []
 
-    for record in zip(chars, poss, qlabels):
+    for record in zip(chars, poss, labels):
         c = record[0]
         p = record[1]
         l = record[2]
