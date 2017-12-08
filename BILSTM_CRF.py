@@ -5,24 +5,26 @@ import tensorflow as tf
 
 class BILSTM_CRF(object):
     
-    def __init__(self, num_chars, num_classes, num_steps=200, num_epochs=100, embedding_matrix=None, is_training=True, is_crf=True, weight=False):
+    def __init__(self, num_chars, num_poses, num_classes, num_steps=200, num_epochs=100, embedding_matrix=None, is_training=True, is_crf=True, weight=False):
         # Parameter
         self.max_f1 = 0
         self.learning_rate = 0.002
         self.dropout_rate = 0.5
         self.batch_size = 64
         self.num_layers = 1   
-        self.emb_dim = 100
+        self.emb_dim = 80
+        self.pos_dim = 20
         self.hidden_dim = 100
         self.num_epochs = num_epochs
         self.num_steps = num_steps
         self.num_chars = num_chars
+        self.num_poses = num_poses
         self.num_classes = num_classes
         
-        # placeholder of x, y and weight
+        # placeholder of x, x_pos, y
         self.inputs = tf.placeholder(tf.int32, [None, self.num_steps])
+        self.poses = tf.placeholder(tf.int32, [None, self.num_steps])
         self.targets = tf.placeholder(tf.int32, [None, self.num_steps])
-        # self.targets_weight = tf.placeholder(tf.float32, [None, self.num_steps])
         self.targets_transition = tf.placeholder(tf.int32, [None])
         
         # char embedding
@@ -31,6 +33,15 @@ class BILSTM_CRF(object):
         else:
             self.embedding = tf.get_variable("emb", [self.num_chars, self.emb_dim])
         self.inputs_emb = tf.nn.embedding_lookup(self.embedding, self.inputs)
+
+        #pos embedding
+        self.pos_embedding = tf.get_variable("pos_embedding", [self.num_poses, self.pos_dim])
+        self.pos_emb = tf.nn.embedding_lookup(self.pos_embedding, self.poses)
+
+        #nonlinear layer
+        self.inputs_emb = tf.concat([self.inputs_emb, self.pos_emb], axis=2)
+        self.inputs_emb = tf.tanh(self.inputs_emb)
+
         self.inputs_emb = tf.transpose(self.inputs_emb, [1, 0, 2])
         self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.emb_dim])
         self.inputs_emb = tf.split(axis=0, num_or_size_splits=self.num_steps, value=self.inputs_emb)
@@ -150,10 +161,11 @@ class BILSTM_CRF(object):
 
         return tf.reduce_sum(self.logsumexp(last_alphas, axis=1)), max_scores, max_scores_pre        
 
-    def train(self, sess, save_file, X_train, y_train, X_val, y_val):
+    def train(self, sess, save_file, X_train, X_pos_train, y_train, X_val, X_pos_val, y_val):
         saver = tf.train.Saver()
 
         char2id, id2char = helper.loadMap("char2id")
+        pos2id, id2pos = helper.loadMap("pos2id")
         label2id, id2label = helper.loadMap("label2id")
 
         merged = tf.summary.merge_all()
@@ -168,11 +180,12 @@ class BILSTM_CRF(object):
             sh_index = np.arange(len(X_train))
             np.random.shuffle(sh_index)
             X_train = X_train[sh_index]
+            X_pos_train = X_pos_train[sh_index]
             y_train = y_train[sh_index]
             print "current epoch: %d" % (epoch)
             for iteration in range(num_iterations):
                 # train
-                X_train_batch, y_train_batch = helper.nextBatch(X_train, y_train, start_index=iteration * self.batch_size, batch_size=self.batch_size)
+                X_train_batch, X_pos_train_batch, y_train_batch = helper.nextBatch(X_train, X_pos_train, y_train, start_index=iteration * self.batch_size, batch_size=self.batch_size)
                 # y_train_weight_batch = 1 + np.array((y_train_batch == label2id['B']) | (y_train_batch == label2id['E']), float)
                 transition_batch = helper.getTransition(y_train_batch)
                 
@@ -187,7 +200,8 @@ class BILSTM_CRF(object):
                     ], 
                     feed_dict={
                         self.targets_transition:transition_batch, 
-                        self.inputs:X_train_batch, 
+                        self.inputs:X_train_batch,
+                        self.poses:X_pos_train_batch,
                         self.targets:y_train_batch 
                         # self.targets_weight:y_train_weight_batch
                     })
@@ -195,13 +209,14 @@ class BILSTM_CRF(object):
                 predicts_train = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
                 if iteration > 0 and iteration % 10 == 0:
                     cnt += 1
-                    precision_train, recall_train, f1_train = self.evaluate(X_train_batch, y_train_batch, predicts_train, id2char, id2label)
+                    hit_num, pred_num, true_num = self.evaluate(X_train_batch, y_train_batch, predicts_train, id2char, id2label)
+                    precision_val, recall_val, f1_val = self.caculate(hit_num, pred_num, true_num)
                     summary_writer_train.add_summary(train_summary, cnt)
                     print "iteration: %5d, train loss: %5d, train precision: %.5f, train recall: %.5f, train f1: %.5f" % (iteration, loss_train, precision_train, recall_train, f1_train)  
                     
                 # validation
                 if iteration > 0 and iteration % 100 == 0:
-                    X_val_batch, y_val_batch = helper.nextRandomBatch(X_val, y_val, batch_size=self.batch_size)
+                    X_val_batch, X_pos_val_batch, y_val_batch = helper.nextRandomBatch(X_val, y_val, batch_size=self.batch_size)
                     # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
                     transition_batch = helper.getTransition(y_val_batch)
                     
@@ -216,27 +231,24 @@ class BILSTM_CRF(object):
                         feed_dict={
                             self.targets_transition:transition_batch, 
                             self.inputs:X_val_batch, 
+                            self.poses:X_pos_val_batch,
                             self.targets:y_val_batch 
                             # self.targets_weight:y_val_weight_batch
                         })
                     
                     predicts_val = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
-                    precision_val, recall_val, f1_val = self.evaluate(X_val_batch, y_val_batch, predicts_val, id2char, id2label)
+                    hit_num, pred_num, true_num = self.evaluate(X_val_batch, y_val_batch, predicts_val, id2char, id2label)
+                    precision_val, recall_val, f1_val = self.caculate(hit_num, pred_num, true_num)
                     summary_writer_val.add_summary(val_summary, cnt)
                     print "iteration: %5d, valid loss: %5d, valid precision: %.5f, valid recall: %.5f, valid f1: %.5f" % (iteration, loss_val, precision_val, recall_val, f1_val)
 
-                    if f1_val > self.max_f1:
-                        self.max_f1 = f1_val
-                        save_path = saver.save(sess, save_file)
-                        print "saved the best model with f1: %.5f" % (self.max_f1)
-
                 if iteration == num_iterations -1:
                     num_val_iterations = int(math.ceil(1.0 * len(X_val) / self.batch_size))
-                    precision_val = 0
-                    recall_val = 0
-                    f1_val = 0
+                    hit_num = 0
+                    pred_num = 0
+                    true_num = 0
                     for val_iteration in range(num_val_iterations):
-                        X_val_batch, y_val_batch = helper.nextBatch(X_val, y_val, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
+                        X_val_batch, X_pos_val_batch, y_val_batch = helper.nextBatch(X_val, y_val, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
                         # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
                         transition_batch = helper.getTransition(y_val_batch)
                         loss_val, max_scores, max_scores_pre, length, val_summary =\
@@ -250,21 +262,28 @@ class BILSTM_CRF(object):
                             feed_dict={
                                 self.targets_transition:transition_batch, 
                                 self.inputs:X_val_batch, 
+                                self.poses:X_pos_val_batch,
                                 self.targets:y_val_batch 
                                 # self.targets_weight:y_val_weight_batch
                             })
                     
                         predicts_val = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
-                        i_precision_val, i_recall_val, i_f1_val = self.evaluate(X_val_batch, y_val_batch, predicts_val, id2char, id2label)
-                        precision_val += i_precision_val
-                        recall_val += i_recall_val
-                        f1_val += i_f1_val
-                    print "valid precision: %.5f, valid recall: %.5f, valid f1: %.5f" % (precision_val/num_val_iterations, recall_val/num_val_iterations, f1_val/num_val_iterations)
+                        i_hit_num, i_pred_num, i_true_num = self.evaluate(X_val_batch, y_val_batch, predicts_val, id2char, id2label)
+                        hit_num += i_hit_num
+                        pred_num += i_pred_num
+                        true_num += i_true_num
+                    precision_val, recall_val, f1_val = self.caculate(hit_num, pred_num, true_num)
+                    if f1_val > self.max_f1:
+                        self.max_f1 = f1_val
+                        save_path = saver.save(sess, save_file)
+                        print "saved the best model with f1: %.5f" % (self.max_f1)
+                    print "valid precision: %.5f, valid recall: %.5f, valid f1: %.5f" % (precision_val, recall_val, f1_val)
 
 
 
-    def test(self, sess, X_test, X_test_str, output_path):
+    def test(self, sess, X_test, X_pos_test, X_test_str, output_path):
         char2id, id2char = helper.loadMap("char2id")
+        pos2id, id2pos = helper.loadMap("pos2id")
         label2id, id2label = helper.loadMap("label2id")
         num_iterations = int(math.ceil(1.0 * len(X_test) / self.batch_size))
         print "number of iteration: " + str(num_iterations)
@@ -273,24 +292,25 @@ class BILSTM_CRF(object):
                 print "iteration: " + str(i + 1)
                 results = []
                 X_test_batch = X_test[i * self.batch_size : (i + 1) * self.batch_size]
+                X_pos_test_batch = X_pos_test[i * self.batch_size : (i + 1) * self.batch_size]
                 X_test_str_batch = X_test_str[i * self.batch_size : (i + 1) * self.batch_size]
                 if i == num_iterations - 1 and len(X_test_batch) < self.batch_size:
                     X_test_batch = list(X_test_batch)
+                    X_pos_test_batch = list(X_pos_test_batch)
                     X_test_str_batch = list(X_test_str_batch)
                     last_size = len(X_test_batch)
                     X_test_batch += [[0 for j in range(self.num_steps)] for i in range(self.batch_size - last_size)]
+                    X_pos_test_batch += [[0 for j in range(self.num_steps)] for i in range(self.batch_size - last_size)]
                     X_test_str_batch += [['x' for j in range(self.num_steps)] for i in range(self.batch_size - last_size)]
                     X_test_batch = np.array(X_test_batch)
+                    X_pos_test_batch = np.array(X_pos_test_batch) 
                     X_test_str_batch = np.array(X_test_str_batch)
-                    results = self.predictBatch(sess, X_test_batch, X_test_str_batch, id2label)
+                    results = self.predictBatch(sess, X_test_batch, X_pos_test_batch, X_test_str_batch, id2label)
                     results = results[:last_size]
                 else:
                     X_test_batch = np.array(X_test_batch)
-                    results = self.predictBatch(sess, X_test_batch, X_test_str_batch, id2label)
-                
-                for i in range(len(results)):
-                    doc = ''.join(X_test_str_batch[i])
-                    outfile.write(doc + "<@>" +" ".join(results[i]).encode("utf-8") + "\n")
+                    X_pos_test_batch = np.array(X_pos_test_batch) 
+                    results = self.predictBatch(sess, X_test_batch, X_pos_test_batch, X_test_str_batch, id2label)
 
     def viterbi(self, max_scores, max_scores_pre, length, predict_size=128):
         best_paths = []
@@ -305,21 +325,16 @@ class BILSTM_CRF(object):
             best_paths.append(path)
         return best_paths
 
-    def predictBatch(self, sess, X, X_str, id2label):
+    def predictBatch(self, sess, X, X_pos, X_str, id2label):
         results = []
-        length, max_scores, max_scores_pre = sess.run([self.length, self.max_scores, self.max_scores_pre], feed_dict={self.inputs:X})
+        length, max_scores, max_scores_pre = sess.run([self.length, self.max_scores, self.max_scores_pre], feed_dict={self.inputs:X, self.poses:X_pos})
         predicts = self.viterbi(max_scores, max_scores_pre, length, self.batch_size)
         for i in range(len(predicts)):
-            x = ''.join(X_str[i]).decode("utf-8")
-            y_pred = ''.join([id2label[val] for val in predicts[i] if val != 5 and val != 0])
-            entitys = helper.extractEntity(x, y_pred)
-            results.append(entitys)
+            y_pred = [id2label[val] for val in predicts[i]]
+            results.append(y_pred)
         return results
 
     def evaluate(self, X, y_true, y_pred,id2char, id2label):
-        precision = -1.0
-        recall = -1.0
-        f1 = -1.0
         hit_num = 0
         pred_num = 0
         true_num = 0
@@ -333,11 +348,16 @@ class BILSTM_CRF(object):
                 if y_hat[t] != '<PAD>' and y_hat[t] != 'O':
                     pred_num += 1
                 if y[t] != '<PAD>' and y[t] != 'O':
-                    true_num += 1
+        return hit_num, pred_num, true_num  
+
+    def caculate(self, hit_num, pred_num, true_num):
+        precision = -1.0;
+        recall = -1.0
+        f1 = -1.0
         if pred_num != 0:
             precision = 1.0 * hit_num / pred_num
         if true_num != 0:
             recall = 1.0 * hit_num / true_num
         if precision > 0 and recall > 0:
             f1 = 2.0 * (precision * recall) / (precision + recall)
-        return precision, recall, f1  
+        return precision, recall, f1

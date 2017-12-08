@@ -27,11 +27,15 @@ num_steps = 200  # it must consist with the train
 start_time = time.time()
 
 print "preparing test data"
-X_test, X_test_str = helper.getTest(test_path=test_path, seq_max_len=num_steps)
+X_test, X_pos_test, X_test_str = helper.getTest(test_path=test_path, seq_max_len=num_steps)
 char2id, id2char = helper.loadMap("char2id")
+pos2id, id2pos = helper.loadMap("pos2id")
 label2id, id2label = helper.loadMap("label2id")
+
 num_chars = len(id2char.keys())
+num_poses = len(id2pos.keys())
 num_classes = len(id2label.keys())
+
 if emb_path != None:
     embedding_matrix = helper.getEmbedding(emb_path)
 else:
@@ -43,7 +47,7 @@ with tf.Session(config=config) as sess:
     with tf.device(gpu_config):
         initializer = tf.random_uniform_initializer(-0.1, 0.1)
         with tf.variable_scope("model", reuse=None, initializer=initializer):
-            model = BILSTM_CRF(num_chars=num_chars, num_classes=num_classes, num_steps=num_steps,
+            model = BILSTM_CRF(num_chars=num_chars, num_poses=num_poses, num_classes=num_classes, num_steps=num_steps,
                                embedding_matrix=embedding_matrix, is_training=False)
 
         print "loading model parameter"
@@ -51,7 +55,7 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, model_path)
 
         print "testing"
-        model.test(sess, X_test, X_test_str, output_path)
+        model.test(sess, X_test, X_pos_test, X_test_str, output_path)
 
         end_time = time.time()
         print "time used %f(hour)" % ((end_time - start_time) / 3600)
