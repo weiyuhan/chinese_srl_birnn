@@ -12,7 +12,7 @@ class BILSTM_CRF(object):
         self.dropout_rate = 0.5
         self.batch_size = 64
         self.num_layers = 1   
-        self.emb_dim = 80
+        self.emb_dim = 100
         self.pos_dim = 20
         self.hidden_dim = 100
         self.num_epochs = num_epochs
@@ -39,7 +39,7 @@ class BILSTM_CRF(object):
         self.pos_emb = tf.nn.embedding_lookup(self.pos_embedding, self.poses)
 
         #nonlinear layer
-        self.inputs_emb = tf.concat([self.inputs_emb, self.pos_emb], axis=2)
+        #self.inputs_emb = tf.concat([self.inputs_emb, self.pos_emb], axis=2)
         self.inputs_emb = tf.tanh(self.inputs_emb)
 
         self.inputs_emb = tf.transpose(self.inputs_emb, [1, 0, 2])
@@ -210,7 +210,7 @@ class BILSTM_CRF(object):
                 if iteration > 0 and iteration % 10 == 0:
                     cnt += 1
                     hit_num, pred_num, true_num = self.evaluate(X_train_batch, y_train_batch, predicts_train, id2char, id2label)
-                    precision_val, recall_val, f1_val = self.caculate(hit_num, pred_num, true_num)
+                    precision_train, recall_train, f1_train = self.caculate(hit_num, pred_num, true_num)
                     summary_writer_train.add_summary(train_summary, cnt)
                     print "iteration: %5d, train loss: %5d, train precision: %.5f, train recall: %.5f, train f1: %.5f" % (iteration, loss_train, precision_train, recall_train, f1_train)  
                     
