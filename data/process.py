@@ -36,15 +36,16 @@ def generateInput(data, saveFile):
 	f = open(saveFile, 'w')
 	for line in data:
 		words = line['words']
+		poss = line['poss']
 		srs = line['srs']
 		for i in range(len(words)):
-			f.write(words[i] + '\t' + srs[i] + '\n')
+			f.write(words[i] + '\t' + poss[i] + '\t' + srs[i] + '\n')
 		f.write('\n')
 	f.close()
 
 data = splitFile('cpbtrain.txt')
-makeDict(data, 'words', 'word2id')
-makeDict(data, 'srs', 'label2id')
-#generateInput(data, 'train.in')
-#data = splitFile('cpbdev.txt')
-#generateInput(data, 'validation.in')
+#makeDict(data, 'words', 'word2id')
+#makeDict(data, 'srs', 'label2id')
+generateInput(data, 'train.in')
+data = splitFile('cpbdev.txt')
+generateInput(data, 'validation.in')
