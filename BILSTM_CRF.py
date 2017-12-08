@@ -12,7 +12,7 @@ class BILSTM_CRF(object):
         self.dropout_rate = 0.5
         self.batch_size = 64
         self.num_layers = 1   
-        self.emb_dim = 100
+        self.emb_dim = 80
         self.pos_dim = 20
         self.hidden_dim = 100
         self.num_epochs = num_epochs
@@ -39,12 +39,17 @@ class BILSTM_CRF(object):
         self.pos_emb = tf.nn.embedding_lookup(self.pos_embedding, self.poses)
 
         #nonlinear layer
-        #self.inputs_emb = tf.concat([self.inputs_emb, self.pos_emb], axis=2)
+        self.inputs_emb = tf.concat([self.inputs_emb, self.pos_emb], axis=2)
         self.inputs_emb = tf.tanh(self.inputs_emb)
+        #shape: (?, num_steps, emb_dim+pos_dim)
 
         self.inputs_emb = tf.transpose(self.inputs_emb, [1, 0, 2])
-        self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.emb_dim])
+        #shape: (num_steps, ?, emb_dim+pos_dim)
+        self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.hidden_dim])
+        #hidden_dim = emb_dim+pos_dim
+        #shape: (?, hidden_dim)
         self.inputs_emb = tf.split(axis=0, num_or_size_splits=self.num_steps, value=self.inputs_emb)
+        #shape: (?/num_steps, hidden_dim) * num_steps
 
         # lstm cell
         lstm_cell_fw = tf.nn.rnn_cell.BasicLSTMCell(self.hidden_dim)
