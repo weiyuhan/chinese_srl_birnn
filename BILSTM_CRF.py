@@ -212,7 +212,7 @@ class BILSTM_CRF(object):
                     hit_num, pred_num, true_num = self.evaluate(X_train_batch, y_train_batch, predicts_train, id2char, id2label)
                     precision_train, recall_train, f1_train = self.caculate(hit_num, pred_num, true_num)
                     summary_writer_train.add_summary(train_summary, cnt)
-                    print "iteration: %5d, train loss: %5d, train precision: %.5f, train recall: %.5f, train f1: %.5f" % (iteration, loss_train, precision_train, recall_train, f1_train)  
+                    print "iteration: %5d/%5d, train loss: %5d, train precision: %.5f, train recall: %.5f, train f1: %.5f" % (iteration, num_iterations, loss_train, precision_train, recall_train, f1_train)  
                     
                 # validation
                 if iteration > 0 and iteration % 100 == 0:
