@@ -27,31 +27,37 @@ def getEmbedding(infile_path="embedding"):
     return emb_matrix
 
 
-def nextBatch(X, y, start_index, batch_size=128):
+def nextBatch(X, X_pos, y, start_index, batch_size=128):
     last_index = start_index + batch_size
     X_batch = list(X[start_index:min(last_index, len(X))])
+    X_pos_batch = list(X_pos[start_index:min(last_index, len(X))])
     y_batch = list(y[start_index:min(last_index, len(X))])
     if last_index > len(X):
         left_size = last_index - (len(X))
         for i in range(left_size):
             index = np.random.randint(len(X))
             X_batch.append(X[index])
+            X_pos_batch.append(X_pos[index])
             y_batch.append(y[index])
     X_batch = np.array(X_batch)
+    X_pos_batch = np.array(X_pos_batch)
     y_batch = np.array(y_batch)
-    return X_batch, y_batch
+    return X_batch, X_pos_batch, y_batch
 
 
-def nextRandomBatch(X, y, batch_size=128):
+def nextRandomBatch(X, X_pos, y, batch_size=128):
     X_batch = []
+    X_pos_batch = []
     y_batch = []
     for i in range(batch_size):
         index = np.random.randint(len(X))
         X_batch.append(X[index])
+        X_pos_batch.append(X_pos[index])
         y_batch.append(y[index])
     X_batch = np.array(X_batch)
+    X_pos_batch = np.array(X_pos_batch)
     y_batch = np.array(y_batch)
-    return X_batch, y_batch
+    return X_batch, X_pos_batch, y_batch
 
 
 # use "0" to padding the sentence
