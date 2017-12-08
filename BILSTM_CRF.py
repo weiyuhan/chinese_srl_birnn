@@ -216,7 +216,7 @@ class BILSTM_CRF(object):
                     
                 # validation
                 if iteration > 0 and iteration % 100 == 0:
-                    X_val_batch, X_pos_val_batch, y_val_batch = helper.nextRandomBatch(X_val, y_val, batch_size=self.batch_size)
+                    X_val_batch, X_pos_val_batch, y_val_batch = helper.nextRandomBatch(X_val, X_pos_val, y_val, batch_size=self.batch_size)
                     # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
                     transition_batch = helper.getTransition(y_val_batch)
                     
@@ -248,7 +248,7 @@ class BILSTM_CRF(object):
                     pred_num = 0
                     true_num = 0
                     for val_iteration in range(num_val_iterations):
-                        X_val_batch, X_pos_val_batch, y_val_batch = helper.nextBatch(X_val, y_val, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
+                        X_val_batch, X_pos_val_batch, y_val_batch = helper.nextBatch(X_val, X_pos_val, y_val, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
                         # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
                         transition_batch = helper.getTransition(y_val_batch)
                         loss_val, max_scores, max_scores_pre, length, val_summary =\
