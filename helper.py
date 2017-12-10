@@ -178,7 +178,7 @@ def prepare(chars, lefts, rights, poss, lposs, rposs, rels, diss, labels, seq_ma
         rp = record[5]
         rl = record[6]
         d = record[7]
-        l = record[2]
+        l = record[8]
         # empty line
         if c == -1:
             if len(tmp_x) <= seq_max_len:
@@ -229,6 +229,8 @@ def prepare(chars, lefts, rights, poss, lposs, rposs, rels, diss, labels, seq_ma
         X_rel = np.array(X_rel)
         X_dis = np.array(X_dis)
     y = np.array(padding(y, seq_max_len))
+
+    print(y[0])
 
     return X, X_left, X_right, X_pos, X_lpos, X_rpos, X_rel, X_dis, y
 
