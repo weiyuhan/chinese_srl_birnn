@@ -1,6 +1,8 @@
 import json
 import collections
 
+max_dis = -1;
+
 def splitFile(filename):
 	f = open(filename)
 	lines = f.readlines()
@@ -13,7 +15,13 @@ def splitFile(filename):
 		for wps in tokens:
 			if wps == '\n' or wps == '':
 				continue
-			word, pos, sr = wps.split('/')
+			tokens = wps.split('/')
+			word = tokens[0]
+			pos = tokens[1]
+			if len(tokens) == 3:
+				sr = tokens[2]
+			else:
+				sr = 'O'
 			words.append(word)
 			poss.append(pos)
 			srs.append(sr)
@@ -33,13 +41,38 @@ def makeDict(data, key, saveFile):
 	f.close()
 
 def generateInput(data, saveFile):
+	global max_dis;
 	f = open(saveFile, 'w')
 	for line in data:
 		words = line['words']
 		poss = line['poss']
 		srs = line['srs']
 		for i in range(len(words)):
-			f.write(words[i] + '\t' + poss[i] + '\t' + srs[i] + '\n')
+			if srs[i] == 'rel':
+				rel_index = i
+				rel = words[i]
+		for i in range(len(words)):
+			word = words[i]
+			left_word = '<PAD>'
+			if i > 0:
+				left_word = words[i-1]
+			right_word = '<PAD>'
+			if i < len(words) - 1:
+				right_word = words[i+1]
+			pos = poss[i]
+			left_pos = '<PAD>'
+			if i > 0:
+				left_pos = poss[i-1]
+			right_pos = '<PAD>'
+			if i < len(poss) - 1:
+				right_pos = poss[i+1]
+			rel_distance = abs(rel_index - i)
+			if max_dis < rel_distance:
+				max_dis = rel_distance
+			sr = srs[i]
+			f.write(word + '\t' + left_word + '\t' + right_word + '\t' + 
+				pos + '\t' + left_pos + '\t' + right_pos + '\t' + 
+				rel + '\t' + str(rel_distance) + '\t' + sr + '\n')
 		f.write('\n')
 	f.close()
 
@@ -49,3 +82,6 @@ data = splitFile('cpbtrain.txt')
 generateInput(data, 'train.in')
 data = splitFile('cpbdev.txt')
 generateInput(data, 'validation.in')
+data = splitFile('cpbtest.txt')
+generateInput(data, 'test.in')
+print(max_dis)
