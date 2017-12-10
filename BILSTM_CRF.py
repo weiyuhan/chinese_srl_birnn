@@ -200,7 +200,7 @@ class BILSTM_CRF(object):
 
         X_val = val_data['char']
         X_left_val = val_data['left']
-            X_right_val = val_data['right']
+        X_right_val = val_data['right']
         X_pos_val = val_data['pos']
         X_lpos_val = val_data['lpos']
         X_rpos_val = val_data['rpos']
