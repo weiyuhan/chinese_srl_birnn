@@ -366,6 +366,8 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
 
     print "train size: %d, validation size: %d" % (len(X_train), len(y_val))
 
+    train_data = {}
+
     train_data['char'] = X_train
     train_data['left'] = X_left_train
     train_data['right'] = X_right_train
@@ -375,6 +377,8 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
     train_data['rel'] = X_rel_train
     train_data['dis'] = X_dis_train
     train_data['label'] = y_train
+
+    val_data = {}
 
     val_data['char'] = X_val
     val_data['left'] = X_left_val
