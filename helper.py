@@ -76,15 +76,15 @@ def nextBatch(dataSet, start_index, batch_size=128):
     y_batch = np.array(y_batch)
 
     batches = {}
-    batches['char'] = X
-    batches['left'] = X_left
-    batches['right'] = X_right
-    batches['pos'] = X_pos
-    batches['lpos'] = X_lpos
-    batches['rpos'] = X_rpos
-    batches['rel'] = X_rel
-    batches['dis'] = X_dis
-    batches['label'] = y
+    batches['char'] = X_batch
+    batches['left'] = X_left_batch
+    batches['right'] = X_right_batch
+    batches['pos'] = X_pos_batch
+    batches['lpos'] = X_lpos_batch
+    batches['rpos'] = X_rpos_batch
+    batches['rel'] = X_rel_batch
+    batches['dis'] = X_dis_batch
+    batches['label'] = y_batch
     return batches
 
 def nextRandomBatch(dataSet, batch_size=128):
@@ -129,15 +129,15 @@ def nextRandomBatch(dataSet, batch_size=128):
     y_batch = np.array(y_batch)
 
     batches = {}
-    batches['char'] = X
-    batches['left'] = X_left
-    batches['right'] = X_right
-    batches['pos'] = X_pos
-    batches['lpos'] = X_lpos
-    batches['rpos'] = X_rpos
-    batches['rel'] = X_rel
-    batches['dis'] = X_dis
-    batches['label'] = y
+    batches['char'] = X_batch
+    batches['left'] = X_left_batch
+    batches['right'] = X_right_batch
+    batches['pos'] = X_pos_batch
+    batches['lpos'] = X_lpos_batch
+    batches['rpos'] = X_rpos_batch
+    batches['rel'] = X_rel_batch
+    batches['dis'] = X_dis_batch
+    batches['label'] = y_batch
     return batches
 
 # use "0" to padding the sentence
@@ -229,9 +229,6 @@ def prepare(chars, lefts, rights, poss, lposs, rposs, rels, diss, labels, seq_ma
         X_rel = np.array(X_rel)
         X_dis = np.array(X_dis)
     y = np.array(padding(y, seq_max_len))
-
-    print(y[0])
-
     return X, X_left, X_right, X_pos, X_lpos, X_rpos, X_rel, X_dis, y
 
 

@@ -56,18 +56,12 @@ class BILSTM_CRF(object):
         self.dis_embedding = tf.get_variable("dis_embedding", [self.num_dises, self.dis_dim])
         self.dis_emb = tf.nn.embedding_lookup(self.dis_embedding, self.dises)
 
-        print(self.inputs_emb.shape)
-        print(self.pos_emb.shape)
-        print(self.dis_emb.shape)
-
         #nonlinear layer
         self.inputs_emb = tf.concat([self.inputs_emb, self.lefts_emb, self.rights_emb, 
             self.pos_emb, self.lpos_emb, self.rpos_emb, self.rels_emb, self.dis_emb], axis=2)
         self.inputs_emb = tf.tanh(self.inputs_emb)
         #shape: (?, num_steps, emb_dim+pos_dim)
 
-        print(self.inputs_emb.shape)
-        
         self.inputs_emb = tf.transpose(self.inputs_emb, [1, 0, 2])
         #shape: (num_steps, ?, emb_dim+pos_dim)
         self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.hidden_dim])
@@ -238,6 +232,17 @@ class BILSTM_CRF(object):
             X_rel_train = X_rel_train[sh_index]
             X_dis_train = X_dis_train[sh_index]
             y_train = y_train[sh_index]
+
+            train_data['char'] = X_train
+            train_data['left'] = X_left_train
+            train_data['right'] = X_right_train
+            train_data['pos'] = X_pos_train
+            train_data['lpos'] = X_lpos_train
+            train_data['rpos'] = X_rpos_train
+            train_data['rel'] = X_rel_train
+            train_data['dis'] = X_dis_train
+            train_data['label'] = y_train
+
             print "current epoch: %d" % (epoch)
             for iteration in range(num_iterations):
                 # train
@@ -287,7 +292,7 @@ class BILSTM_CRF(object):
                     
                 # validation
                 if iteration > 0 and iteration % 100 == 0:
-                    val_batches = helper.nextRandomBatch(X_val, X_pos_val, y_val, batch_size=self.batch_size)
+                    val_batches = helper.nextRandomBatch(val_data, batch_size=self.batch_size)
                     
                     X_val_batch = val_batches['char']
                     X_left_val_batch = val_batches['left']
@@ -336,7 +341,7 @@ class BILSTM_CRF(object):
                     pred_num = 0
                     true_num = 0
                     for val_iteration in range(num_val_iterations):
-                        val_batches = helper.nextBatch(X_val, X_pos_val, y_val, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
+                        val_batches = helper.nextBatch(val_data, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
                         X_val_batch = val_batches['char']
                         X_left_val_batch = val_batches['left']
                         X_right_val_batch = val_batches['right']
