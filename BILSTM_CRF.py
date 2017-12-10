@@ -15,7 +15,8 @@ class BILSTM_CRF(object):
         self.emb_dim = 50 #char, left, right, rel
         self.pos_dim = 25 #pos, lpos, rpos
         self.dis_dim = 25 #dis
-        self.hidden_dim = 300
+        self.input_dim = 300
+        self.hidden_dim = 100
         self.num_epochs = num_epochs
         self.num_steps = num_steps
         self.num_chars = num_chars
@@ -64,9 +65,13 @@ class BILSTM_CRF(object):
 
         self.inputs_emb = tf.transpose(self.inputs_emb, [1, 0, 2])
         #shape: (num_steps, ?, emb_dim+pos_dim)
-        self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.hidden_dim])
+        self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.input_dim])
         #hidden_dim = emb_dim+pos_dim
         #shape: (?, hidden_dim)
+        self.input_linear_w = tf.get_variable("input_linear_w", [self.input_dim, self.hidden_dim])
+        self.input_linear_b = tf.get_variable("input_linear_b", [self.hidden_dim])
+        self.inputs_emb = tf.matmul(self.inputs_emb, self.input_linear_w) + self.input_linear_b
+
         self.inputs_emb = tf.split(axis=0, num_or_size_splits=self.num_steps, value=self.inputs_emb)
         #shape: (?/num_steps, hidden_dim) * num_steps
 
