@@ -310,7 +310,7 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
     df_train["lpos_id"] = df_train.lpos.map(lambda x: -1 if str(x) == str(np.nan) else pos2id[x])
     df_train["rpos_id"] = df_train.rpos.map(lambda x: -1 if str(x) == str(np.nan) else pos2id[x])
     
-    df_train["dis_id"] = df_train.rpos.map(lambda x: int(x))
+    df_train["dis_id"] = df_train.dis.map(lambda x: int(x))
     
     df_train["label_id"] = df_train.label.map(lambda x: -1 if str(x) == str(np.nan) else label2id[x])
 
