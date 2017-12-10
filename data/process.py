@@ -1,7 +1,8 @@
 import json
 import collections
 
-max_dis = -1;
+max_dis = -1
+min_dis = 1000
 
 def splitFile(filename):
 	f = open(filename)
@@ -41,7 +42,8 @@ def makeDict(data, key, saveFile):
 	f.close()
 
 def generateInput(data, saveFile):
-	global max_dis;
+	global max_dis
+	global min_dis
 	f = open(saveFile, 'w')
 	for line in data:
 		words = line['words']
@@ -69,6 +71,8 @@ def generateInput(data, saveFile):
 			rel_distance = abs(rel_index - i)
 			if max_dis < rel_distance:
 				max_dis = rel_distance
+			if min_dis > rel_distance:
+				min_dis = rel_distance
 			sr = srs[i]
 			f.write(word + '\t' + left_word + '\t' + right_word + '\t' + 
 				pos + '\t' + left_pos + '\t' + right_pos + '\t' + 
@@ -85,3 +89,4 @@ generateInput(data, 'validation.in')
 data = splitFile('cpbtest.txt')
 generateInput(data, 'test.in')
 print(max_dis)
+print(min_dis)

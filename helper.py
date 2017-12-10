@@ -208,7 +208,7 @@ def prepare(chars, lefts, rights, poss, lposs, rposs, rels, diss, labels, seq_ma
             tmp_lpos.append(lp)
             tmp_rpos.append(rp)
             tmp_rel.append(rl)
-            tmp_dis.append(d)
+            tmp_dis.append(int(d))
             tmp_y.append(l)
     if is_padding:
         X = np.array(padding(X, seq_max_len))
@@ -310,14 +310,12 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
     df_train["lpos_id"] = df_train.lpos.map(lambda x: -1 if str(x) == str(np.nan) else pos2id[x])
     df_train["rpos_id"] = df_train.rpos.map(lambda x: -1 if str(x) == str(np.nan) else pos2id[x])
     
-    df_train["dis_id"] = df_train.dis.map(lambda x: int(x))
-    
     df_train["label_id"] = df_train.label.map(lambda x: -1 if str(x) == str(np.nan) else label2id[x])
 
     # convert the data in maxtrix
-    X, X_pos, y = prepare(df_train["char_id"], df_train["left_id"], df_train["right_id"],
+    X, X_left, X_right, X_pos, X_lpos, X_rpos, X_rel, X_dis, y = prepare(df_train["char_id"], df_train["left_id"], df_train["right_id"],
         df_train["pos_id"], df_train["lpos_id"], df_train["rpos_id"],
-        df_train["rel_id"], df_train["dis_id"], df_train["label_id"], seq_max_len)
+        df_train["rel_id"], df_train["dis"], df_train["label_id"], seq_max_len)
 
     # shuffle the samples
     num_samples = len(X)
@@ -414,14 +412,12 @@ def getTest(test_path="test.in", is_validation=False, seq_max_len=200):
     df_test["lpos_id"] = df_test.lpos.map(lambda x: mapFunc(x, pos2id))
     df_test["rpos_id"] = df_test.rpos.map(lambda x: mapFunc(x, pos2id))
     
-    df_test["dis_id"] = df_test.dis.map(lambda x: int(x))
-    
     df_test["label_id"] = df_test.label.map(lambda x: -1 if str(x) == str(np.nan) else label2id[x])
 
     X_test, X_left_test, X_right_test, X_pos_test, X_lpos_test, X_rpos_test, X_rel_test, X_dis_test, y_test = prepare(
         df_test["char_id"], df_test["left_id"], df_test["right_id"], 
         df_test["pos_id"], df_test["lpos_id"], df_test["rpos_id"], 
-        df_test["rel_id"], df_test["dis_id"], df_test["label_id"], seq_max_len)
+        df_test["rel_id"], df_test["dis"], df_test["label_id"], seq_max_len)
     if is_validation:
         return X_test, X_left_test, X_right_test, X_pos_test, X_lpos_test, X_rpos_test, X_rel_test, X_dis_test, y_test
     else:
