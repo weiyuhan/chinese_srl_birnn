@@ -449,13 +449,27 @@ def calc_f1(preds_lines, id2label, gold_file):
     golds_lines = open(gold_file, 'r').read().strip().split('\n')
     golds = [gold.split() for gold in golds_lines]
     preds = []
+    print("---------------------------------")
+    print(len(preds_lines))
+    print(len(golds_lines))
+    print("---------------------------------")
+    for i in range(len(preds_lines)):
+        preds_line = preds_lines[i]
+        golds_line = golds_lines[i]
+        str_preds = [str(id2label[val].encode("utf-8")) for val in preds_line]
+        print("---------------------------------")
+        print(len(str_preds))
+        print(str_preds)
+        print(len(golds_line))
+        print(golds_line)
+        print("---------------------------------")
     for i in range(len(golds_lines)):
         preds_line = preds_lines[i]
         golds_line = golds_lines[i]
         str_preds_line = []
         str_preds = [str(id2label[val].encode("utf-8")) for val in preds_line]
-        for t in range(len(golds_line)):
-            str_preds_line.append(golds_line[t] + '/' + str_preds[t])
+        for t in range(len(str_preds)):
+            str_preds_line.append(golds[i][t] + '/' + str_preds[t])
         preds.append(str_preds_line)
     assert len(golds) == len(preds), "length of prediction file and gold file should be the same."
     for gold, pred in zip(golds, preds):
