@@ -335,11 +335,9 @@ class BILSTM_CRF(object):
                     summary_writer_val.add_summary(val_summary, cnt)
                     print "iteration: %5d, valid loss: %5d, valid precision: %.5f, valid recall: %.5f, valid f1: %.5f" % (iteration, loss_val, precision_val, recall_val, f1_val)
 
-                if iteration == num_iterations -1:
+                if epoch > 1 and iteration == num_iterations -1:
                     num_val_iterations = int(math.ceil(1.0 * len(X_val) / self.batch_size))
-                    hit_num = 0
-                    pred_num = 0
-                    true_num = 0
+                    preds_lines = []
                     for val_iteration in range(num_val_iterations):
                         val_batches = helper.nextBatch(val_data, start_index=val_iteration * self.batch_size, batch_size=self.batch_size)
                         X_val_batch = val_batches['char']
@@ -377,16 +375,14 @@ class BILSTM_CRF(object):
                             })
                     
                         predicts_val = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
-                        i_hit_num, i_pred_num, i_true_num = self.evaluate(y_val_batch, predicts_val, id2char, id2label)
-                        hit_num += i_hit_num
-                        pred_num += i_pred_num
-                        true_num += i_true_num
-                    precision_val, recall_val, f1_val = self.caculate(hit_num, pred_num, true_num)
+                        preds_lines.extend(predicts_val)
+                    preds_lines = preds_lines[:len(y_val)]
+                    recall_val, precision_val, f1_val, errors = helper.calc_f1(preds_lines, id2label, '/data/cpbdev.txt')
                     if f1_val > self.max_f1:
                         self.max_f1 = f1_val
                         save_path = saver.save(sess, save_file)
                         print "saved the best model with f1: %.5f" % (self.max_f1)
-                    print "valid precision: %.5f, valid recall: %.5f, valid f1: %.5f" % (precision_val, recall_val, f1_val)
+                    print "valid precision: %.5f, valid recall: %.5f, valid f1: %.5f, errors: %5d" % (precision_val, recall_val, f1_val, errors)
 
 
 
@@ -536,7 +532,7 @@ class BILSTM_CRF(object):
                     pred_num += 1
                 if y[t] != '<PAD>' and y[t] != 'O':
                     true_num +=1 
-        return hit_num, pred_num, true_num  
+        return hit_num, pred_num, true_num 
 
     def caculate(self, hit_num, pred_num, true_num):
         precision = -1.0;

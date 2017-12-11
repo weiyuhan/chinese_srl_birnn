@@ -441,3 +441,96 @@ def getTransition(y_train_batch):
             transition_batch.append(i * 6 + j)
     transition_batch = np.array(transition_batch)
     return transition_batch
+
+
+def calc_f1(preds_lines, id2label, gold_file):
+    errors = 0
+    case_true, case_recall, case_precision = 0, 0, 0
+    golds_lines = open(gold_file, 'r').read().strip().split('\n')
+    golds = [gold.split() for gold in golds_lines]
+    preds = []
+    for i in range(len(golds_lines)):
+        preds_line = preds_lines[i]
+        golds_line = golds_lines[i]
+        str_preds_line = []
+        str_preds = [str(id2label[val].encode("utf-8")) for val in preds_line]
+        for t in range(len(golds_line)):
+            str_preds_line.append(golds_line[t] + '/' + str_preds[t])
+        preds.append(str_preds_line)
+    assert len(golds) == len(preds), "length of prediction file and gold file should be the same."
+    for gold, pred in zip(golds, preds):
+        lastname = ''
+        keys_gold, keys_pred = {}, {}
+        for item in gold:
+            word, label = item.split('/')[0], item.split('/')[-1]
+            flag, name = label[:label.find('-')], label[label.find('-')+1:]
+            if flag == 'O':
+                continue
+            if flag == 'S':
+                if name not in keys_gold:
+                    keys_gold[name] = [word]
+                else:
+                    keys_gold[name].append(word)
+            else:
+                if flag == 'B':
+                    if name not in keys_gold:
+                        keys_gold[name] = [word]
+                    else:
+                        keys_gold[name].append(word)
+                    lastname = name
+                elif flag == 'I' or flag == 'E':
+                    if name != lastname:
+                        keys_gold[name][-1] = 'error'
+                    else:
+                        keys_gold[name][-1] += ' ' + word
+        for item in pred:
+            word, label = item.split('/')[0], item.split('/')[-1]
+            flag, name = label[:label.find('-')], label[label.find('-')+1:]
+            if flag == 'O':
+                continue
+            if flag == 'S':
+                if name not in keys_pred:
+                    keys_pred[name] = [word]
+                else:
+                    keys_pred[name].append(word)
+            else:
+                if flag == 'B':
+                    if name not in keys_pred:
+                        keys_pred[name] = [word]
+                    else:
+                        keys_pred[name].append(word)
+                    lastname = name
+                elif flag == 'I' or flag == 'E':
+                    if name != lastname:
+                        keys_pred[name][-1] = 'error'
+                    else:
+                        keys_pred[name][-1] += ' ' + word
+        
+        for key in keys_gold:
+            case_recall += len(keys_gold[key])
+            for word in keys_gold[key]:
+                if word == 'error':
+                    error += 1
+        case_recall -= error
+        error = 0
+        for key in keys_pred:
+            case_precision += len(keys_pred[key])
+            for word in keys_pred[key]:
+                if word == 'error':
+                    error += 1
+        case_precision -= error
+
+        for key in keys_pred:
+            if key in keys_gold:
+                for word in keys_pred[key]:
+                    if word in keys_gold[key] and word != 'error':
+                        case_true += 1
+                        keys_gold[key].remove(word) # avoid replicate words
+    if case_recall == 0:
+        case_recall = 1
+    if case_precision == 0:
+        case_precision = 1
+    recall = 1.0 * case_true / case_recall
+    precision = 1.0 * case_true / case_precision
+    f1 = 2.0 * recall * precision / (recall + precision)
+    return recall, precision, f1, errors
