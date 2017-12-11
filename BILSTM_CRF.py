@@ -377,7 +377,7 @@ class BILSTM_CRF(object):
                         predicts_val = self.viterbi(max_scores, max_scores_pre, length, predict_size=self.batch_size)
                         preds_lines.extend(predicts_val)
                     preds_lines = preds_lines[:len(y_val)]
-                    recall_val, precision_val, f1_val, errors = helper.calc_f1(preds_lines, id2label, '/data/cpbdev.txt')
+                    recall_val, precision_val, f1_val, errors = helper.calc_f1(preds_lines, id2label, 'cpbdev.txt')
                     if f1_val > self.max_f1:
                         self.max_f1 = f1_val
                         save_path = saver.save(sess, save_file)
