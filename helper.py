@@ -464,7 +464,7 @@ def calc_f1(preds_lines, id2label, gold_file):
         for item in gold:
             word, label = item.split('/')[0], item.split('/')[-1]
             flag, name = label[:label.find('-')], label[label.find('-')+1:]
-            if flag == 'O':
+            if flag == 'O' || flag == 'rel':
                 continue
             if flag == 'S':
                 if name not in keys_gold:
@@ -486,7 +486,7 @@ def calc_f1(preds_lines, id2label, gold_file):
         for item in pred:
             word, label = item.split('/')[0], item.split('/')[-1]
             flag, name = label[:label.find('-')], label[label.find('-')+1:]
-            if flag == 'O':
+            if flag == 'O' || flag == 'rel':
                 continue
             if flag == 'S':
                 if name not in keys_pred:
