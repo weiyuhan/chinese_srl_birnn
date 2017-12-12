@@ -444,7 +444,6 @@ def getTransition(y_train_batch, num_classes):
 
 
 def calc_f1(preds_lines, id2label, gold_file):
-    errors = 0
     case_true, case_recall, case_precision = 0, 0, 0
     golds_lines = open(gold_file, 'r').read().strip().split('\n')
     golds = [gold.split() for gold in golds_lines]
@@ -464,7 +463,7 @@ def calc_f1(preds_lines, id2label, gold_file):
         for item in gold:
             word, label = item.split('/')[0], item.split('/')[-1]
             flag, name = label[:label.find('-')], label[label.find('-')+1:]
-            if flag == 'O' || flag == 'rel':
+            if flag == 'O' or flag == 'rel':
                 continue
             if flag == 'S':
                 if name not in keys_gold:
@@ -479,14 +478,12 @@ def calc_f1(preds_lines, id2label, gold_file):
                         keys_gold[name].append(word)
                     lastname = name
                 elif flag == 'I' or flag == 'E':
-                    if name != lastname:
-                        keys_gold[lastname][-1] = 'error'
-                    else:
-                        keys_gold[name][-1] += ' ' + word
+                    assert name == lastname, "the I-/E- labels are inconsistent with B- labels in gold file."
+                    keys_gold[name][-1] += ' ' + word
         for item in pred:
             word, label = item.split('/')[0], item.split('/')[-1]
             flag, name = label[:label.find('-')], label[label.find('-')+1:]
-            if flag == 'O' || flag == 'rel':
+            if flag == 'O' or flag == 'rel':
                 continue
             if flag == 'S':
                 if name not in keys_pred:
@@ -502,16 +499,15 @@ def calc_f1(preds_lines, id2label, gold_file):
                     lastname = name
                 elif flag == 'I' or flag == 'E':
                     if name != lastname:
-                        keys_pred[lastname][-1] = 'error'
+                        if lastname not in keys_pred:
+                            keys_pred[lastname] = ['error']
+                        else:
+                            keys_pred[lastname][-1] = 'error'
                     else:
                         keys_pred[name][-1] += ' ' + word
         
         for key in keys_gold:
             case_recall += len(keys_gold[key])
-            for word in keys_gold[key]:
-                if word == 'error':
-                    errors += 1
-        case_recall -= errors
         errors = 0
         for key in keys_pred:
             case_precision += len(keys_pred[key])
