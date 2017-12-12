@@ -457,6 +457,13 @@ def calc_f1(preds_lines, id2label, gold_file):
             str_preds_line.append(golds[i][t] + '/' + str_preds[t])
         preds.append(str_preds_line)
     assert len(golds) == len(preds), "length of prediction file and gold file should be the same."
+    outputFile = open('validation.out', 'w')
+    for line in preds:
+        for item in line:
+            word, tlabel, label = item.split('/')[0], item.split('/')[-2], item.split('/')[-1]
+            outputFile.write(word + '\t\t' + tlabel + '\t\t' + label + '\n')
+        outputFile.write('\n')
+    outputFile.close()
     for gold, pred in zip(golds, preds):
         lastname = ''
         keys_gold, keys_pred = {}, {}
