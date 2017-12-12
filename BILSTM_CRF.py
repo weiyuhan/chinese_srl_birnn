@@ -335,7 +335,7 @@ class BILSTM_CRF(object):
                     summary_writer_val.add_summary(val_summary, cnt)
                     print "iteration: %5d, valid loss: %5d, valid precision: %.5f, valid recall: %.5f, valid f1: %.5f" % (iteration, loss_val, precision_val, recall_val, f1_val)
 
-                if epoch > 1 and iteration == num_iterations -1:
+                if epoch >= 0 and iteration == num_iterations -1:
                     num_val_iterations = int(math.ceil(1.0 * len(X_val) / self.batch_size))
                     preds_lines = []
                     for val_iteration in range(num_val_iterations):
