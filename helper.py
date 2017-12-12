@@ -427,10 +427,10 @@ def getTest(test_path="test.in", is_validation=False, seq_max_len=200):
         return X_test, X_left_test, X_right_test, X_pos_test, X_lpos_test, X_rpos_test, X_rel_test, X_dis_test
 
 
-def getTransition(y_train_batch):
+def getTransition(y_train_batch, num_classes):
     transition_batch = []
     for m in range(len(y_train_batch)):
-        y = [5] + list(y_train_batch[m]) + [0]
+        y = [num_classes] + list(y_train_batch[m]) + [0]
         for t in range(len(y)):
             if t + 1 == len(y):
                 continue
@@ -438,7 +438,7 @@ def getTransition(y_train_batch):
             j = y[t + 1]
             if i == 0:
                 break
-            transition_batch.append(i * 6 + j)
+            transition_batch.append(i * (num_classes + 1) + j)
     transition_batch = np.array(transition_batch)
     return transition_batch
 
@@ -449,9 +449,17 @@ def calc_f1(preds_lines, id2label, gold_file):
     golds_lines = open(gold_file, 'r').read().strip().split('\n')
     golds = [gold.split() for gold in golds_lines[:-1]]
     preds = []
+    print('------------------')
+    print(len(golds))
+    print(len(preds_lines))
+    print('------------------')
     for i in range(len(preds_lines)):
         preds_line = preds_lines[i]
         golds_line = golds_lines[i]
+        print('------------------')
+        print(len(preds_line))
+        print(len(golds[i]))
+        print('------------------')
         str_preds_line = []
         str_preds = [str(id2label[val].encode("utf-8")) for val in preds_line]
         for t in range(len(str_preds)):

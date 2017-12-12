@@ -257,7 +257,7 @@ class BILSTM_CRF(object):
                 X_dis_train_batch = train_batches['dis']
                 y_train_batch = train_batches['label']
                 # y_train_weight_batch = 1 + np.array((y_train_batch == label2id['B']) | (y_train_batch == label2id['E']), float)
-                transition_batch = helper.getTransition(y_train_batch)
+                transition_batch = helper.getTransition(y_train_batch, self.num_classes)
                 
                 _, loss_train, max_scores, max_scores_pre, length, train_summary =\
                     sess.run([
@@ -305,7 +305,7 @@ class BILSTM_CRF(object):
                     y_val_batch = val_batches['label']
                     
                     # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
-                    transition_batch = helper.getTransition(y_val_batch)
+                    transition_batch = helper.getTransition(y_val_batch, self.num_classes)
                     
                     loss_val, max_scores, max_scores_pre, length, val_summary =\
                         sess.run([
@@ -351,7 +351,7 @@ class BILSTM_CRF(object):
                         y_val_batch = val_batches['label']
 
                         # y_val_weight_batch = 1 + np.array((y_val_batch == label2id['B']) | (y_val_batch == label2id['E']), float)
-                        transition_batch = helper.getTransition(y_val_batch)
+                        transition_batch = helper.getTransition(y_val_batch, self.num_classes)
                         loss_val, max_scores, max_scores_pre, length, val_summary =\
                             sess.run([
                                 self.loss, 
