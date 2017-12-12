@@ -480,6 +480,7 @@ def calc_f1(preds_lines, id2label, gold_file):
                 elif flag == 'I' or flag == 'E':
                     assert name == lastname, "the I-/E- labels are inconsistent with B- labels in gold file."
                     keys_gold[name][-1] += ' ' + word
+        lastname = ''
         for item in pred:
             word, label = item.split('/')[0], item.split('/')[-1]
             flag, name = label[:label.find('-')], label[label.find('-')+1:]
@@ -504,7 +505,10 @@ def calc_f1(preds_lines, id2label, gold_file):
                         else:
                             keys_pred[lastname][-1] = 'error'
                     else:
-                        keys_pred[name][-1] += ' ' + word
+                        if name not in keys_pred:
+                            keys_pred[name] = ['error']
+                        else:
+                            keys_pred[name][-1] += ' ' + word
         
         for key in keys_gold:
             case_recall += len(keys_gold[key])
