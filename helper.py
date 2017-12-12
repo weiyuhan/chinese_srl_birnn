@@ -480,7 +480,7 @@ def calc_f1(preds_lines, id2label, gold_file):
                     lastname = name
                 elif flag == 'I' or flag == 'E':
                     if name != lastname:
-                        keys_gold[name][-1] = 'error'
+                        keys_gold[lastname][-1] = 'error'
                     else:
                         keys_gold[name][-1] += ' ' + word
         for item in pred:
@@ -502,7 +502,7 @@ def calc_f1(preds_lines, id2label, gold_file):
                     lastname = name
                 elif flag == 'I' or flag == 'E':
                     if name != lastname:
-                        keys_pred[name][-1] = 'error'
+                        keys_pred[lastname][-1] = 'error'
                     else:
                         keys_pred[name][-1] += ' ' + word
         
@@ -523,7 +523,7 @@ def calc_f1(preds_lines, id2label, gold_file):
         for key in keys_pred:
             if key in keys_gold:
                 for word in keys_pred[key]:
-                    if word in keys_gold[key] and word != 'error':
+                    if word != 'error' and word in keys_gold[key]:
                         case_true += 1
                         keys_gold[key].remove(word) # avoid replicate words
     if case_recall == 0:
