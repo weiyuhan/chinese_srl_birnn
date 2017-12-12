@@ -447,23 +447,9 @@ def calc_f1(preds_lines, id2label, gold_file):
     errors = 0
     case_true, case_recall, case_precision = 0, 0, 0
     golds_lines = open(gold_file, 'r').read().strip().split('\n')
-    golds = [gold.split() for gold in golds_lines]
+    golds = [gold.split() for gold in golds_lines[:-1]]
     preds = []
-    print("---------------------------------")
-    print(len(preds_lines))
-    print(len(golds_lines))
-    print("---------------------------------")
     for i in range(len(preds_lines)):
-        preds_line = preds_lines[i]
-        golds_line = golds_lines[i]
-        str_preds = [str(id2label[val].encode("utf-8")) for val in preds_line]
-        print("---------------------------------")
-        print(len(str_preds))
-        print(str_preds)
-        print(len(golds_line))
-        print(golds_line)
-        print("---------------------------------")
-    for i in range(len(golds_lines)):
         preds_line = preds_lines[i]
         golds_line = golds_lines[i]
         str_preds_line = []
