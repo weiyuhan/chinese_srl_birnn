@@ -447,12 +447,8 @@ def calc_f1(preds_lines, id2label, gold_file):
     errors = 0
     case_true, case_recall, case_precision = 0, 0, 0
     golds_lines = open(gold_file, 'r').read().strip().split('\n')
-    golds = [gold.split() for gold in golds_lines[]]
+    golds = [gold.split() for gold in golds_lines]
     preds = []
-    print('------------------')
-    print(golds[-1])
-    print(preds_lines[-1])
-    print('------------------')
     for i in range(len(preds_lines[:-1])):
         preds_line = preds_lines[i]
         golds_line = golds_lines[i]
@@ -514,15 +510,15 @@ def calc_f1(preds_lines, id2label, gold_file):
             case_recall += len(keys_gold[key])
             for word in keys_gold[key]:
                 if word == 'error':
-                    error += 1
-        case_recall -= error
-        error = 0
+                    errors += 1
+        case_recall -= errors
+        errors = 0
         for key in keys_pred:
             case_precision += len(keys_pred[key])
             for word in keys_pred[key]:
                 if word == 'error':
-                    error += 1
-        case_precision -= error
+                    errors += 1
+        case_precision -= errors
 
         for key in keys_pred:
             if key in keys_gold:
