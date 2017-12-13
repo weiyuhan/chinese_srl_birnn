@@ -70,7 +70,7 @@ class BILSTM_CRF(object):
         #hidden_dim = emb_dim+pos_dim
         #shape: (?, hidden_dim)
 
-        self.nonLinear1_w = tf.get_variable("nonLinear1_w", [self.word_represent_dim, self.nonlinear_dim])
+        self.nonLinear1_w = tf.get_variable("nonLinear1_w", [self.word_represent_dim, self.nonlinear1_dim])
         
         self.inputs_emb = tf.matmul(self.inputs_emb, self.nonLinear1_w)
         self.inputs_emb = tf.tanh(self.inputs_emb)
