@@ -448,7 +448,7 @@ def calc_f1(preds_lines, id2label, gold_file):
     golds_lines = open(gold_file, 'r').read().strip().split('\n')
     golds = [gold.split() for gold in golds_lines]
     preds = []
-    for i in range(len(preds_lines[:-1])):
+    for i in range(len(preds_lines)):
         preds_line = preds_lines[i]
         golds_line = golds_lines[i]
         str_preds_line = []
