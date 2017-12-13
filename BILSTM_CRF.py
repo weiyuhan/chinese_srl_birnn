@@ -5,7 +5,7 @@ import tensorflow as tf
 
 class BILSTM_CRF(object):
     
-    def __init__(self, num_chars, num_poses, num_dises, num_classes, num_steps=200, num_epochs=100, embedding_matrix=None, is_training=True, is_crf=True, weight=False):
+    def __init__(self, num_chars, num_poses, num_dises, num_classes, num_steps=200, num_epochs=100, embedding_matrix=None, is_training=True, is_crf=False, weight=False):
         # Parameter
         self.max_f1 = 0
         self.learning_rate = 0.002
@@ -117,7 +117,7 @@ class BILSTM_CRF(object):
 
         if not is_crf:
             self.tags_scores = tf.reshape(self.logits, [self.batch_size, self.num_steps, self.num_classes])
-            self.crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.targets, logits=logits)
+            self.crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.targets, logits=self.tags_scores)
             self.target_weights = tf.sign(self.targets)
             self.loss = (tf.reduce_sum(self.crossent * self.target_weights) / self.batch_size)
         else:
