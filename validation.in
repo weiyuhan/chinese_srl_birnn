@@ -46724,5 +46724,3 @@ II型	糖尿病	在	NN	NN	P	认为	15	I-ARG1
 经验	管理	的	NN	NN	DEC	生产	37	O
 的	经验	。	DEC	NN	PU	生产	38	O
 。	的	<PAD>	PU	DEC	<PAD>	生产	39	O
-
-

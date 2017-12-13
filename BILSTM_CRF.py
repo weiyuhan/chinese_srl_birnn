@@ -13,9 +13,12 @@ class BILSTM_CRF(object):
         self.batch_size = 64
         self.num_layers = 1   
         self.emb_dim = 50 #char, left, right, rel
-        self.pos_dim = 25 #pos, lpos, rpos
-        self.dis_dim = 25 #dis
-        self.hidden_dim = 300
+        self.pos_dim = 20 #pos, lpos, rpos
+        self.dis_dim = 20 #dis
+        self.word_represent_dim = 280
+        self.nonlinear1_dim = 200
+        self.hidden_dim = 100
+        self.nonlinear2_dim = 200
         self.num_epochs = num_epochs
         self.num_steps = num_steps
         self.num_chars = num_chars
@@ -59,14 +62,19 @@ class BILSTM_CRF(object):
         #nonlinear layer
         self.inputs_emb = tf.concat([self.inputs_emb, self.lefts_emb, self.rights_emb, 
             self.pos_emb, self.lpos_emb, self.rpos_emb, self.rels_emb, self.dis_emb], axis=2)
-        self.inputs_emb = tf.tanh(self.inputs_emb)
         #shape: (?, num_steps, emb_dim+pos_dim)
 
         self.inputs_emb = tf.transpose(self.inputs_emb, [1, 0, 2])
         #shape: (num_steps, ?, emb_dim+pos_dim)
-        self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.hidden_dim])
+        self.inputs_emb = tf.reshape(self.inputs_emb, [-1, self.word_represent_dim])
         #hidden_dim = emb_dim+pos_dim
         #shape: (?, hidden_dim)
+
+        self.nonLinear1_w = tf.get_variable("nonLinear1_w", [self.word_represent_dim, self.nonlinear_dim])
+        
+        self.inputs_emb = tf.matmul(self.inputs_emb, self.nonLinear1_w)
+        self.inputs_emb = tf.tanh(self.inputs_emb)
+        
         self.inputs_emb = tf.split(axis=0, num_or_size_splits=self.num_steps, value=self.inputs_emb)
         #shape: (?/num_steps, hidden_dim) * num_steps
 
@@ -97,12 +105,21 @@ class BILSTM_CRF(object):
         
         # softmax
         self.outputs = tf.reshape(tf.concat(axis=1, values=self.outputs), [-1, self.hidden_dim * 2])
-        self.softmax_w = tf.get_variable("softmax_w", [self.hidden_dim * 2, self.num_classes])
-        self.softmax_b = tf.get_variable("softmax_b", [self.num_classes])
-        self.logits = tf.matmul(self.outputs, self.softmax_w) + self.softmax_b
+        
+        self.nonLinear2_w = tf.get_variable("nonLinear2_w", [self.hidden_dim * 2, self.nonlinear2_dim])
+
+        self.outputs = tf.matmul(self.outputs, self.nonLinear2_w)
+        self.outputs = tf.tanh(self.outputs)
+
+        self.softmax_w = tf.get_variable("softmax_w", [self.nonlinear2_dim, self.num_classes])
+        
+        self.logits = tf.matmul(self.outputs, self.softmax_w)
 
         if not is_crf:
             self.tags_scores = tf.reshape(self.logits, [self.batch_size, self.num_steps, self.num_classes])
+            self.crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.targets, logits=logits)
+            self.target_weights = tf.sign(self.targets)
+            self.loss = (tf.reduce_sum(self.crossent * self.target_weights) / self.batch_size)
         else:
             self.tags_scores = tf.reshape(self.logits, [self.batch_size, self.num_steps, self.num_classes])
             self.transitions = tf.get_variable("transitions", [self.num_classes + 1, self.num_classes + 1])
@@ -475,6 +492,8 @@ class BILSTM_CRF(object):
                     test_batches['dis'] = X_dis_test_batch
                     
                     results = self.predictBatch(sess, test_batches, id2label)
+                for line in results:
+                    outfile.write(' '.join(line) + '\n')
 
     def viterbi(self, max_scores, max_scores_pre, length, predict_size=128):
         best_paths = []

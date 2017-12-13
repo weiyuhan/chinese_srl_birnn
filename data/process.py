@@ -74,18 +74,18 @@ def generateInput(data, saveFile):
 			if min_dis > rel_distance:
 				min_dis = rel_distance
 			sr = srs[i]
-			f.write(word + '\t' + left_word + '\t' + right_word + '\t' + 
-				pos + '\t' + left_pos + '\t' + right_pos + '\t' + 
-				rel + '\t' + str(rel_distance) + '\t' + sr + '\n')
+			f.write(word.strip('\n') + '\t' + left_word.strip('\n') + '\t' + right_word.strip('\n') + '\t' + 
+				pos.strip('\n') + '\t' + left_pos.strip('\n') + '\t' + right_pos.strip('\n') + '\t' + 
+				rel.strip('\n') + '\t' + str(rel_distance).strip('\n') + '\t' + sr.strip('\n') + '\n')
 		f.write('\n')
 	f.close()
 
-data = splitFile('cpbtrain.txt')
+#data = splitFile('cpbtrain.txt')
 #makeDict(data, 'words', 'word2id')
 #makeDict(data, 'srs', 'label2id')
-generateInput(data, 'train.in')
-data = splitFile('cpbdev.txt')
-generateInput(data, 'validation.in')
+#generateInput(data, 'train.in')
+#data = splitFile('cpbdev.txt')
+#generateInput(data, 'validation.in')
 data = splitFile('cpbtest.txt')
 generateInput(data, 'test.in')
 print(max_dis)
