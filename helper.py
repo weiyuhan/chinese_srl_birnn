@@ -443,7 +443,7 @@ def getTransition(y_train_batch, num_classes):
     return transition_batch
 
 
-def calc_f1(preds_lines, id2label, gold_file):
+def calc_f1(preds_lines, id2label, gold_file, outfile):
     case_true, case_recall, case_precision = 0, 0, 0
     golds_lines = open(gold_file, 'r').read().strip().split('\n')
     golds = [gold.split() for gold in golds_lines]
@@ -457,7 +457,7 @@ def calc_f1(preds_lines, id2label, gold_file):
             str_preds_line.append(golds[i][t] + '/' + str_preds[t])
         preds.append(str_preds_line)
     assert len(golds) == len(preds), "length of prediction file and gold file should be the same."
-    outputFile = open('validation.out', 'w')
+    outputFile = open(outfile, 'w')
     for line in preds:
         for item in line:
             word, tlabel, label = item.split('/')[0], item.split('/')[-2], item.split('/')[-1]
