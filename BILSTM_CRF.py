@@ -5,7 +5,7 @@ import tensorflow as tf
 
 class BILSTM_CRF(object):
     
-    def __init__(self, num_chars, num_poses, num_dises, num_classes, num_steps=200, num_epochs=100, embedding_matrix=None, is_training=True, is_crf=False, weight=False):
+    def __init__(self, num_chars, num_poses, num_dises, num_classes, num_steps=200, num_epochs=100, embedding_matrix=None, is_training=True, is_crf=True, weight=False):
         # Parameter
         self.max_f1 = 0
         self.learning_rate = 0.002
@@ -13,11 +13,11 @@ class BILSTM_CRF(object):
         self.batch_size = 64
         self.num_layers = 1   
         self.emb_dim = 50 #char, left, right, rel
-        self.pos_dim = 20 #pos, lpos, rpos
-        self.dis_dim = 20 #dis
-        self.word_represent_dim = 280
+        self.pos_dim = 25 #pos, lpos, rpos
+        self.dis_dim = 25 #dis
+        self.word_represent_dim = 300
         self.nonlinear1_dim = 200
-        self.hidden_dim = 100
+        self.hidden_dim = 300
         self.nonlinear2_dim = 200
         self.num_epochs = num_epochs
         self.num_steps = num_steps
@@ -70,9 +70,9 @@ class BILSTM_CRF(object):
         #hidden_dim = emb_dim+pos_dim
         #shape: (?, hidden_dim)
 
-        self.nonLinear1_w = tf.get_variable("nonLinear1_w", [self.word_represent_dim, self.nonlinear1_dim])
+        #self.nonLinear1_w = tf.get_variable("nonLinear1_w", [self.word_represent_dim, self.nonlinear1_dim])
         
-        self.inputs_emb = tf.matmul(self.inputs_emb, self.nonLinear1_w)
+        #self.inputs_emb = tf.matmul(self.inputs_emb, self.nonLinear1_w)
         self.inputs_emb = tf.tanh(self.inputs_emb)
         
         self.inputs_emb = tf.split(axis=0, num_or_size_splits=self.num_steps, value=self.inputs_emb)
@@ -106,12 +106,13 @@ class BILSTM_CRF(object):
         # softmax
         self.outputs = tf.reshape(tf.concat(axis=1, values=self.outputs), [-1, self.hidden_dim * 2])
         
-        self.nonLinear2_w = tf.get_variable("nonLinear2_w", [self.hidden_dim * 2, self.nonlinear2_dim])
+        #self.nonLinear2_w = tf.get_variable("nonLinear2_w", [self.hidden_dim * 2, self.nonlinear2_dim])
 
-        self.outputs = tf.matmul(self.outputs, self.nonLinear2_w)
-        self.outputs = tf.tanh(self.outputs)
+        #self.outputs = tf.matmul(self.outputs, self.nonLinear2_w)
+        #self.outputs = tf.tanh(self.outputs)
 
-        self.softmax_w = tf.get_variable("softmax_w", [self.nonlinear2_dim, self.num_classes])
+        self.softmax_w = tf.get_variable("softmax_w", [self.hidden_dim * 2, self.num_classes])
+        self.softmax_b = tf.get_variable("softmax_b", [self.num_classes])
         
         self.logits = tf.matmul(self.outputs, self.softmax_w)
 
