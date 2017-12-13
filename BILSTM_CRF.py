@@ -118,7 +118,7 @@ class BILSTM_CRF(object):
         if not is_crf:
             self.tags_scores = tf.reshape(self.logits, [self.batch_size, self.num_steps, self.num_classes])
             self.crossent = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=self.targets, logits=self.tags_scores)
-            self.target_weights = tf.sign(self.targets)
+            self.target_weights = tf.cast(tf.sign(self.targets), tf.float32)
             self.loss = (tf.reduce_sum(self.crossent * self.target_weights) / self.batch_size)
         else:
             self.tags_scores = tf.reshape(self.logits, [self.batch_size, self.num_steps, self.num_classes])
