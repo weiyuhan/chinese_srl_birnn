@@ -1,4 +1,8 @@
-def generate(predsPath, goldsPath, outPath)
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import sys, os
+
+def generate(predsPath, goldsPath, outPath):
 	predsFile = open(predsPath, 'r')
 	goldsFile = open(goldsPath, 'r')
 
