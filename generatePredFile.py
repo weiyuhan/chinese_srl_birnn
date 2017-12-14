@@ -28,9 +28,9 @@ for predsline, goldsline in zip(preds, golds):
 		preflag = flag
 		newPreds.append(newPred)
 		outline.append(gold + '/' + newPred)
-		if modify:
-			print('--------------------')
-			print(predsline)
-			print(newPreds)
-			print('--------------------')
+	if modify:
+		print('--------------------')
+		print(predsline)
+		print(newPreds)
+		print('--------------------')
 	outputFile.write(' '.join(outline) + '\n')
