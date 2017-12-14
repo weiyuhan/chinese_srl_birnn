@@ -19,11 +19,8 @@ for predsline, goldsline in zip(preds, golds):
 			lastname = name
 		elif flag == 'I' or flag == 'E':
 			if name != lastname:
-				if preflag == '' or preflag == 'O' or preflag == 'S' or preflag == 'E' or preflag == 'rel':
-					newPred = 'B-' + name
-					lastname = name
-				else:
-					newPred = flag + '-' + lastname
+				newPred = 'B-' + name
+				lastname = name
 				modify = True
 		preflag = flag
 		newPreds.append(newPred)
