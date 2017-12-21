@@ -14,9 +14,8 @@ from BILSTM_CRF import BILSTM_CRF
 parser = argparse.ArgumentParser()
 parser.add_argument("train_path", help="the path of the train file")
 parser.add_argument("save_path", help="the path of the saved model")
-parser.add_argument("-v","--val_path", help="the path of the validation file", default=None)
+parser.add_argument("val_path", help="the path of the validation file")
 parser.add_argument("-e","--epoch", help="the number of epoch", default=100, type=int)
-parser.add_argument("-c","--char_emb", help="the char embedding file", default=None)
 parser.add_argument("-g","--gpu", help="the id of gpu, the default is 0", default=0, type=int)
 
 args = parser.parse_args()
@@ -25,7 +24,6 @@ train_path = args.train_path
 save_path = args.save_path
 val_path = args.val_path
 num_epochs = args.epoch
-emb_path = args.char_emb
 gpu_config = "/gpu:"+str(args.gpu)
 # gpu_config = "/cpu:0"
 num_steps = 200 # it must consist with the test
@@ -64,10 +62,7 @@ num_classes = len(id2label.keys())
 num_dises = 250
 
 
-if emb_path != None:
-	embedding_matrix = helper.getEmbedding(emb_path)
-else:
-	embedding_matrix = None
+embedding_matrix = None
 print "building model"
 config = tf.ConfigProto(allow_soft_placement=True)
 with tf.Session(config=config) as sess:

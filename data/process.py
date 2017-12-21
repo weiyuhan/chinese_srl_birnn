@@ -19,13 +19,21 @@ def splitFile(filename):
 			tokens = wps.split('/')
 			word = tokens[0]
 			pos = tokens[1]
+
 			if len(tokens) == 3:
 				sr = tokens[2]
 			else:
 				sr = 'O'
-			words.append(word)
-			poss.append(pos)
-			srs.append(sr)
+			'''
+			flag, name = sr[:sr.find('-')], sr[sr.find('-')+1:]
+			if flag == 'O' or flag == 'rel':
+				sr = flag
+			else:
+				sr = name
+			'''
+			words.append(word.strip('\n'))
+			poss.append(pos.strip('\n'))
+			srs.append(sr.strip('\n'))
 		retLines.append({'words': words, 'poss': poss, 'srs': srs})
 	return retLines
 
@@ -73,20 +81,23 @@ def generateInput(data, saveFile):
 				max_dis = rel_distance
 			if min_dis > rel_distance:
 				min_dis = rel_distance
+
 			sr = srs[i]
+
 			f.write(word.strip('\n') + '\t' + left_word.strip('\n') + '\t' + right_word.strip('\n') + '\t' + 
 				pos.strip('\n') + '\t' + left_pos.strip('\n') + '\t' + right_pos.strip('\n') + '\t' + 
 				rel.strip('\n') + '\t' + str(rel_distance).strip('\n') + '\t' + sr.strip('\n') + '\n')
 		f.write('\n')
 	f.close()
 
-#data = splitFile('cpbtrain.txt')
-#makeDict(data, 'words', 'word2id')
-#makeDict(data, 'srs', 'label2id')
-#generateInput(data, 'train.in')
-#data = splitFile('cpbdev.txt')
-#generateInput(data, 'validation.in')
-data = splitFile('cpbtest.txt')
-generateInput(data, 'test.in')
+train_data = splitFile('cpbtrain.txt')
+generateInput(train_data, 'train.in')
+dev_data = splitFile('cpbdev.txt')
+generateInput(dev_data, 'validation.in')
+test_data = splitFile('cpbtest.txt')
+generateInput(test_data, 'test.in')
+all_data = train_data + test_data + dev_data
+makeDict(all_data, 'srs', 'label2id')
+makeDict(all_data, 'poss', 'pos2id')
 print(max_dis)
 print(min_dis)

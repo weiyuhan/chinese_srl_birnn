@@ -9,26 +9,6 @@ import pandas as pd
 
 csv_name = ["char", "left", "right", "pos", "lpos", "rpos", "rel", "dis", "label"]
 
-def getEmbedding(infile_path="embedding"):
-    char2id, id_char = loadMap("char2id")
-    row_index = 0
-    with open(infile_path, "rb") as infile:
-        for row in infile:
-            row = row.strip()
-            row_index += 1
-            if row_index == 1:
-                num_chars = int(row.split()[0])
-                emb_dim = int(row.split()[1])
-                emb_matrix = np.zeros((len(char2id.keys()), emb_dim))
-                continue
-            items = row.split()
-            char = items[0]
-            emb_vec = [float(val) for val in items[1:]]
-            if char in char2id:
-                emb_matrix[char2id[char]] = emb_vec
-    return emb_matrix
-
-
 def nextBatch(dataSet, start_index, batch_size=128):
     X = dataSet['char']
     X_left = dataSet['left']
@@ -288,7 +268,7 @@ def buildMap(train_path="train.in"):
     id2char[len(chars) + 1] = "<NEW>"
     id2pos[len(chars) + 1] = "<NEW>"
     char2id["<NEW>"] = len(chars) + 1
-    pos2id["<NEW>"] = len(chars) + 1
+    pos2id["<NEW>"] = len(poses) + 1
 
     saveMap(id2char, id2pos, id2label)
 
@@ -341,28 +321,6 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
         X_dis_train = X_dis
         y_train = y
         X_val, X_left_val, X_right_val, X_pos_val, X_lpos_val, X_rpos_val, X_rel_val, X_dis_val, y_val = getTest(val_path, is_validation=True, seq_max_len=seq_max_len)
-    else:
-        # split the data into train and validation set
-        X_train = X[:int(num_samples * train_val_ratio)]
-        X_left_train = X_left[:int(num_samples * train_val_ratio)]
-        X_right_train = X_right[:int(num_samples * train_val_ratio)]
-        X_pos_train = X_pos[:int(num_samples * train_val_ratio)]
-        X_lpos_train = X_lpos[:int(num_samples * train_val_ratio)]
-        X_rpos_train = X_rpos[:int(num_samples * train_val_ratio)]
-        X_rel_train = X_rel[:int(num_samples * train_val_ratio)]
-        X_dis_train = X_dis[:int(num_samples * train_val_ratio)]
-        y_train = y[:int(num_samples * train_val_ratio)]
-        
-        X_val = X[int(num_samples * train_val_ratio):]
-        X_left_val = X_left[int(num_samples * train_val_ratio):]
-        X_right_val = X_right[int(num_samples * train_val_ratio):]
-        X_pos_val = X_pos[int(num_samples * train_val_ratio):]
-        X_lpos_val = X_lpos[int(num_samples * train_val_ratio):]
-        X_rpos_val = X_rpos[int(num_samples * train_val_ratio):]
-        X_rel_val = X_rel[int(num_samples * train_val_ratio):]
-        X_dis_val = X_dis[int(num_samples * train_val_ratio):]
-        y_val = y[int(num_samples * train_val_ratio):]
-
     print "train size: %d, validation size: %d" % (len(X_train), len(y_val))
 
     train_data = {}
