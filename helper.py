@@ -406,7 +406,7 @@ def regularName(beginIndex, lastIndex, line):
     line[beginIndex] = 'B-' + line[beginIndex]
     for i in range(beginIndex + 1, lastIndex - 1):
         line[i] = 'I-' + line[i]
-    line[lastIndex - 1] = 'E-' + line[lastIndex]
+    line[lastIndex - 1] = 'E-' + line[lastIndex - 1]
 
 
 def regularPred(preds_lines):
@@ -422,7 +422,7 @@ def regularPred(preds_lines):
             word, pos, label = item.split('/')[0], item.split('/')[1], item.split('/')[-1]
             
             flag, name = label[:label.find('-')], label[label.find('-')+1:]
-            if flag == 'O' or flag == 'rel':
+            if label == 'O' or label == 'rel':
                 if lastname != '':
                     regularName(beginIndex, j, names_line)
                 lastname = ''
@@ -435,7 +435,7 @@ def regularPred(preds_lines):
                     beginIndex = j
                 names_line.append(name)
             else:
-                name = flag
+                name = label
                 if name != lastname:
                     if lastname != '':
                         regularName(beginIndex, j, names_line)
@@ -443,7 +443,7 @@ def regularPred(preds_lines):
                     beginIndex = j
                 names_line.append(name)
 
-            label_line.append(label)
+            labels_line.append(label)
 
             if j == len(preds_line) - 1:
                 if lastname != '':
