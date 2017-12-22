@@ -19,7 +19,7 @@ def generate(predsPath, goldsPath, outPath):
 			outline.append(gold + '/' + pred)
 		outPreds.append(outline)
 		
-	helper.regularPreds(outPreds)
+	helper.regularPred(outPreds)
 
 	for outline in outPreds:
 		outputFile.write(' '.join(outline) + '\n')

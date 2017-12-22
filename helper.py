@@ -412,27 +412,28 @@ def regularName(beginIndex, lastIndex, line):
 def regularPred(preds_lines):
     for i in range(len(preds_lines)):
         preds_line = preds_lines[i]
-        print('---------------------------')
-        print(preds_line)
         
         lastname = ''
         beginIndex = -1
         names_line = []
-
+        labels_line = []
         for j in range(len(preds_line)):
             item = preds_line[j]
             word, pos, label = item.split('/')[0], item.split('/')[1], item.split('/')[-1]
+            
             flag, name = label[:label.find('-')], label[label.find('-')+1:]
             if flag == 'O' or flag == 'rel':
                 if lastname != '':
                     regularName(beginIndex, j, names_line)
                 lastname = ''
+                names_line.append(flag)
             elif flag == 'S' or flag == 'I' or flag == 'B' or flag == 'E':
                 if name != lastname:
                     if lastname != '':
                         regularName(beginIndex, j, names_line)
                     lastname = name
                     beginIndex = j
+                names_line.append(name)
             else:
                 name = flag
                 if name != lastname:
@@ -440,8 +441,9 @@ def regularPred(preds_lines):
                         regularName(beginIndex, j, names_line)
                     lastname = name
                     beginIndex = j
+                names_line.append(name)
 
-            names_line.append(name)
+            label_line.append(label)
 
             if j == len(preds_line) - 1:
                 if lastname != '':
@@ -452,8 +454,9 @@ def regularPred(preds_lines):
             word, pos = item.split('/')[0], item.split('/')[1]
             name = names_line[j]
             preds_line[j] = word.strip('\n') + '/' + pos.strip('\n') + '/' + name.strip('\n')
-
-        print(preds_line)
+        print('---------------------------')
+        print(labels_line)
+        print(names_line)
         print('---------------------------')
 
 def calc_f1(preds_lines, id2label, gold_file, outfile):
