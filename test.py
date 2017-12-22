@@ -4,7 +4,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from BILSTM_CRF import BILSTM_CRF
+from BILSTM_CRF_tf import BILSTM_CRF
 
 # python test.py model test.in test.out
 
