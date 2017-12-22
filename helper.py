@@ -403,6 +403,7 @@ def getTransition(y_train_batch, num_classes):
 def regularName(beginIndex, lastIndex, line):
     if beginIndex == lastIndex - 1:
         line[beginIndex] = 'S-' + line[beginIndex]
+        return
     line[beginIndex] = 'B-' + line[beginIndex]
     for i in range(beginIndex + 1, lastIndex - 1):
         line[i] = 'I-' + line[i]
@@ -426,7 +427,7 @@ def regularPred(preds_lines):
                 if lastname != '':
                     regularName(beginIndex, j, names_line)
                 lastname = ''
-                names_line.append(flag)
+                names_line.append(label)
             elif flag == 'S' or flag == 'I' or flag == 'B' or flag == 'E':
                 if name != lastname:
                     if lastname != '':
