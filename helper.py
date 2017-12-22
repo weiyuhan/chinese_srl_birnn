@@ -9,6 +9,7 @@ import pandas as pd
 
 csv_name = ["char", "left", "right", "pos", "lpos", "rpos", "rel", "dis", "label"]
 
+#getBatch
 def nextBatch(dataSet, start_index, batch_size=128):
     X = dataSet['char']
     X_left = dataSet['left']
@@ -67,6 +68,7 @@ def nextBatch(dataSet, start_index, batch_size=128):
     batches['label'] = y_batch
     return batches
 
+#getRandomBatch
 def nextRandomBatch(dataSet, batch_size=128):
     X = dataSet['char']
     X_left = dataSet['left']
@@ -127,7 +129,7 @@ def padding(sample, seq_max_len):
             sample[i] += [0 for _ in range(seq_max_len - len(sample[i]))]
     return sample
 
-
+#prepare data as feature[seqtence[word]]
 def prepare(chars, lefts, rights, poss, lposs, rposs, rels, diss, labels, seq_max_len, is_padding=True):
     X = []
     X_left = []
@@ -211,7 +213,7 @@ def prepare(chars, lefts, rights, poss, lposs, rposs, rels, diss, labels, seq_ma
     y = np.array(padding(y, seq_max_len))
     return X, X_left, X_right, X_pos, X_lpos, X_rpos, X_rel, X_dis, y
 
-
+#loac dictionary
 def loadMap(token2id_filepath):
     if not os.path.isfile(token2id_filepath):
         print "file not exist, building map"
@@ -228,7 +230,7 @@ def loadMap(token2id_filepath):
             id2token[token_id] = token
     return token2id, id2token
 
-
+#save dictionary
 def saveMap(id2char, id2pos, id2label):
     with open("char2id", "wb") as outfile:
         for idx in id2char:
@@ -241,7 +243,7 @@ def saveMap(id2char, id2pos, id2label):
             outfile.write(id2label[idx] + "\t" + str(idx) + "\r\n")
     print "saved map between token and id"
 
-
+#build dictionary
 def buildMap(train_path="train.in"):
     df_train = pd.read_csv(train_path, delimiter='\t', quoting=csv.QUOTE_NONE, skip_blank_lines=False, header=None, names=csv_name)
     
@@ -274,12 +276,13 @@ def buildMap(train_path="train.in"):
 
     return char2id, id2char, pos2id, id2pos, label2id, id2label
 
-
+#get train data
 def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, seq_max_len=200):
     char2id, id2char, pos2id, id2pos, label2id, id2label = buildMap(train_path)
+    #read input file
     df_train = pd.read_csv(train_path, delimiter='\t', quoting=csv.QUOTE_NONE, skip_blank_lines=False, header=None, names=csv_name)
 
-    # map the char and label into id
+    # map the word, pos and label into id
     df_train["char_id"] = df_train.char.map(lambda x: -1 if str(x) == str(np.nan) else char2id[x])
     df_train["left_id"] = df_train.left.map(lambda x: -1 if str(x) == str(np.nan) else char2id[x])
     df_train["right_id"] = df_train.right.map(lambda x: -1 if str(x) == str(np.nan) else char2id[x])
@@ -310,6 +313,7 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
     X_dis = X_dis[indexs]
     y = y[indexs]
 
+    #get dev data
     if val_path != None:
         X_train = X
         X_left_train = X_left
@@ -323,8 +327,8 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
         X_val, X_left_val, X_right_val, X_pos_val, X_lpos_val, X_rpos_val, X_rel_val, X_dis_val, y_val = getTest(val_path, is_validation=True, seq_max_len=seq_max_len)
     print "train size: %d, validation size: %d" % (len(X_train), len(y_val))
 
+    #return train data
     train_data = {}
-
     train_data['char'] = X_train
     train_data['left'] = X_left_train
     train_data['right'] = X_right_train
@@ -335,8 +339,8 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
     train_data['dis'] = X_dis_train
     train_data['label'] = y_train
 
+    #return dev data
     val_data = {}
-
     val_data['char'] = X_val
     val_data['left'] = X_left_val
     val_data['right'] = X_right_val
@@ -349,13 +353,15 @@ def getTrain(train_path, val_path, train_val_ratio=0.99, use_custom_val=False, s
 
     return train_data, val_data
 
+#get test data
 def getTest(test_path="test.in", is_validation=False, seq_max_len=200):
     char2id, id2char = loadMap("char2id")
     pos2id, id2pos = loadMap("pos2id")
     label2id, id2label = loadMap("label2id")
-
+    #read input file
     df_test = pd.read_csv(test_path, delimiter='\t', quoting=csv.QUOTE_NONE, skip_blank_lines=False, header=None, names=csv_name)
 
+    #map str to id
     def mapFunc(x, token2id):
         if str(x) == str(np.nan):
             return -1
@@ -364,17 +370,17 @@ def getTest(test_path="test.in", is_validation=False, seq_max_len=200):
         else:
             return token2id[x.decode("utf-8")]
 
+    #get ids for feature
     df_test["char_id"] = df_test.char.map(lambda x: mapFunc(x, char2id))
     df_test["left_id"] = df_test.left.map(lambda x: mapFunc(x, char2id))
     df_test["right_id"] = df_test.right.map(lambda x: mapFunc(x, char2id))
     df_test["rel_id"] = df_test.rel.map(lambda x: mapFunc(x, char2id))
-    
     df_test["pos_id"] = df_test.pos.map(lambda x: mapFunc(x, pos2id))
     df_test["lpos_id"] = df_test.lpos.map(lambda x: mapFunc(x, pos2id))
     df_test["rpos_id"] = df_test.rpos.map(lambda x: mapFunc(x, pos2id))
-    
     df_test["label_id"] = df_test.label.map(lambda x: -1 if str(x) == str(np.nan) else label2id[x])
 
+    #prepare data
     X_test, X_left_test, X_right_test, X_pos_test, X_lpos_test, X_rpos_test, X_rel_test, X_dis_test, y_test = prepare(
         df_test["char_id"], df_test["left_id"], df_test["right_id"], 
         df_test["pos_id"], df_test["lpos_id"], df_test["rpos_id"], 
@@ -384,22 +390,7 @@ def getTest(test_path="test.in", is_validation=False, seq_max_len=200):
     else:
         return X_test, X_left_test, X_right_test, X_pos_test, X_lpos_test, X_rpos_test, X_rel_test, X_dis_test
 
-
-def getTransition(y_train_batch, num_classes):
-    transition_batch = []
-    for m in range(len(y_train_batch)):
-        y = [num_classes] + list(y_train_batch[m]) + [0]
-        for t in range(len(y)):
-            if t + 1 == len(y):
-                continue
-            i = y[t]
-            j = y[t + 1]
-            if i == 0:
-                break
-            transition_batch.append(i * (num_classes + 1) + j)
-    transition_batch = np.array(transition_batch)
-    return transition_batch
-
+#regular B/I/S/E flag for a line
 def regularName(beginIndex, lastIndex, line):
     if beginIndex == lastIndex - 1:
         line[beginIndex] = 'S-' + line[beginIndex]
@@ -409,7 +400,7 @@ def regularName(beginIndex, lastIndex, line):
         line[i] = 'I-' + line[i]
     line[lastIndex - 1] = 'E-' + line[lastIndex - 1]
 
-
+#regular B/I/S/E flag for a dataSet
 def regularPred(preds_lines):
     for i in range(len(preds_lines)):
         preds_line = preds_lines[i]
@@ -429,7 +420,7 @@ def regularPred(preds_lines):
                 lastname = ''
                 names_line.append(label)
             elif flag == 'S' or flag == 'I' or flag == 'B' or flag == 'E':
-                if name != lastname:
+                if name != lastname: # take only name
                     if lastname != '':
                         regularName(beginIndex, j, names_line)
                     lastname = name
@@ -455,11 +446,8 @@ def regularPred(preds_lines):
             word, pos = item.split('/')[0], item.split('/')[1]
             name = names_line[j]
             preds_line[j] = word.strip('\n') + '/' + pos.strip('\n') + '/' + name.strip('\n')
-        print('---------------------------')
-        print(labels_line)
-        print(names_line)
-        print('---------------------------')
 
+#calc_f1 as calc_f1.py
 def calc_f1(preds_lines, id2label, gold_file, outfile):
     case_true, case_recall, case_precision = 0, 0, 0
     golds_lines = open(gold_file, 'r').read().strip().split('\n')

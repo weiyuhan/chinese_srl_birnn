@@ -6,11 +6,7 @@ import pandas as pd
 import tensorflow as tf
 from BILSTM_CRF import BILSTM_CRF
 
-# python train.py train.in model -v validation.in -c char_emb -e 10 -g 2
-
-# python train.py train.in model -v validation.in -e 10
-
-
+#args
 parser = argparse.ArgumentParser()
 parser.add_argument("train_path", help="the path of the train file")
 parser.add_argument("save_path", help="the path of the saved model")
@@ -28,10 +24,12 @@ gpu_config = "/gpu:"+str(args.gpu)
 # gpu_config = "/cpu:0"
 num_steps = 200 # it must consist with the test
 
+#get trainData and devData
 start_time = time.time()
 print "preparing train and validation data"
 train_data, val_data = helper.getTrain(train_path=train_path, val_path=val_path, seq_max_len=num_steps)
 
+#feature for trainData
 X_train = train_data['char']
 X_left_train = train_data['left']
 X_right_train = train_data['right']
@@ -42,6 +40,7 @@ X_rel_train = train_data['rel']
 X_dis_train = train_data['dis']
 y_train = train_data['label']
 
+#feature for devData
 X_val = val_data['char']
 X_left_val = val_data['left']
 X_right_val = val_data['right']
@@ -52,6 +51,7 @@ X_rel_val = val_data['rel']
 X_dis_val = val_data['dis']
 y_val = val_data['label']
 
+#dictionary
 char2id, id2char = helper.loadMap("char2id")
 pos2id, id2pos = helper.loadMap("pos2id")
 label2id, id2label = helper.loadMap("label2id")
@@ -61,16 +61,17 @@ num_poses = len(id2pos.keys())
 num_classes = len(id2label.keys())
 num_dises = 250
 
-
 embedding_matrix = None
 print "building model"
 config = tf.ConfigProto(allow_soft_placement=True)
 with tf.Session(config=config) as sess:
 	with tf.device(gpu_config):
+		#initail Model
 		initializer = tf.random_uniform_initializer(-0.1, 0.1)
 		with tf.variable_scope("model", reuse=None, initializer=initializer):
 			model = BILSTM_CRF(num_chars=num_chars, num_poses=num_poses, num_dises=num_dises, num_classes=num_classes, num_steps=num_steps, num_epochs=num_epochs, embedding_matrix=embedding_matrix, is_training=True)
 
+		#train
 		print "training model"
 		tf.global_variables_initializer().run()
 		model.train(sess, save_path, train_data, val_data)
