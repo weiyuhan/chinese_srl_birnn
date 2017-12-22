@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import sys, os
+import helper
 
 def generate(predsPath, goldsPath, outPath):
 	predsFile = open(predsPath, 'r')
@@ -11,31 +12,16 @@ def generate(predsPath, goldsPath, outPath):
 
 	outputFile = open(outPath, 'w')
 	modify_count = 0
+	outPreds = []
 	for predsline, goldsline in zip(preds, golds):
 		outline = []
-		newPreds = []
-		lastname = ''
-		preflag = ''
-		modify = False
 		for pred, gold in zip(predsline, goldsline):
-			newPred = pred
-			flag, name = pred[:pred.find('-')], pred[pred.find('-')+1:]
-			if flag == 'B':
-				lastname = name
-			elif flag == 'I' or flag == 'E':
-				if name != lastname:
-					newPred = 'B-' + name
-					lastname = name
-					modify = True
-			preflag = flag
-			newPreds.append(newPred)
-			outline.append(gold + '/' + newPred)
-		if modify:
-			modify_count += 1
-			print('--------------------')
-			print(predsline)
-			print(newPreds)
-			print('--------------------')
+			outline.append(gold + '/' + pred)
+		outPreds.append(outline)
+		
+	helper.regularPreds(outPreds)
+
+	for outline in outPreds:
 		outputFile.write(' '.join(outline) + '\n')
 	print('total: %5d, modify: %5d' % (len(preds), modify_count))
 

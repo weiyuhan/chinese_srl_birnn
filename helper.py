@@ -400,6 +400,61 @@ def getTransition(y_train_batch, num_classes):
     transition_batch = np.array(transition_batch)
     return transition_batch
 
+def regularName(beginIndex, lastIndex, line):
+    if beginIndex == lastIndex - 1:
+        line[beginIndex] = 'S-' + line[beginIndex]
+    line[beginIndex] = 'B-' + line[beginIndex]
+    for i in range(beginIndex + 1, lastIndex - 1):
+        line[i] = 'I-' + line[i]
+    line[lastIndex - 1] = 'E-' + line[lastIndex]
+
+
+def regularPred(preds_lines):
+    for i in range(len(preds_lines)):
+        preds_line = preds_lines[i]
+        print('---------------------------')
+        print(preds_line)
+        
+        lastname = ''
+        beginIndex = -1
+        names_line = []
+
+        for j in range(len(preds_line)):
+            item = preds_line[j]
+            word, pos, label = item.split('/')[0], item.split('/')[1], item.split('/')[-1]
+            flag, name = label[:label.find('-')], label[label.find('-')+1:]
+            if flag == 'O' or flag == 'rel':
+                if lastname != '':
+                    regularName(beginIndex, j, names_line)
+                lastname = ''
+            elif flag == 'S' or flag == 'I' or flag == 'B' or flag == 'E':
+                if name != lastname:
+                    if lastname != '':
+                        regularName(beginIndex, j, names_line)
+                    lastname = name
+                    beginIndex = j
+            else:
+                name = flag
+                if name != lastname:
+                    if lastname != '':
+                        regularName(beginIndex, j, names_line)
+                    lastname = name
+                    beginIndex = j
+
+            names_line.append(name)
+
+            if j == len(preds_line) - 1:
+                if lastname != '':
+                    regularName(beginIndex, j+1, names_line)
+
+        for j in range(len(preds_line)):
+            item = preds_line[j]
+            word, pos = item.split('/')[0], item.split('/')[1]
+            name = names_line[j]
+            preds_line[j] = word.strip('\n') + '/' + pos.strip('\n') + '/' + name.strip('\n')
+
+        print(preds_line)
+        print('---------------------------')
 
 def calc_f1(preds_lines, id2label, gold_file, outfile):
     case_true, case_recall, case_precision = 0, 0, 0
@@ -414,6 +469,7 @@ def calc_f1(preds_lines, id2label, gold_file, outfile):
         for t in range(len(str_preds)):
             str_preds_line.append(golds[i][t] + '/' + str_preds[t])
         preds.append(str_preds_line)
+    regularPred(preds)
     assert len(golds) == len(preds), "length of prediction file and gold file should be the same."
     outputFile = open(outfile, 'w')
     for line in preds:

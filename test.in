@@ -8917,16 +8917,16 @@ F－１８	、	“	NR	PU	PU	超过	28	O
 ”	百分之三十六	。	PU	CD	PU	成功	20	O
 。	”	<PAD>	PU	PU	<PAD>	成功	21	O
 
-国家	<PAD>	开发	NN	<PAD>	NN	成功	29	O
-开发	国家	银行	NN	NN	NN	成功	28	O
-银行	开发	首	NN	NN	OD	成功	27	O
-首	银行	次	OD	NN	M	成功	26	O
-次	首	在	M	OD	P	成功	25	O
-在	次	国外	P	M	NN	成功	24	O
-国外	在	发行	NN	P	VV	成功	23	O
-发行	国外	债券	VV	NN	NN	成功	22	O
-债券	发行	成功	NN	VV	VA	成功	21	O
-成功	债券	<PAD>	VA	NN	<PAD>	成功	20	rel
+国家	<PAD>	开发	NN	<PAD>	NN	成功	9	O
+开发	国家	银行	NN	NN	NN	成功	8	O
+银行	开发	首	NN	NN	OD	成功	7	O
+首	银行	次	OD	NN	M	成功	6	O
+次	首	在	M	OD	P	成功	5	O
+在	次	国外	P	M	NN	成功	4	O
+国外	在	发行	NN	P	VV	成功	3	O
+发行	国外	债券	VV	NN	NN	成功	2	O
+债券	发行	成功	NN	VV	VA	成功	1	O
+成功	债券	<PAD>	VA	NN	<PAD>	成功	0	rel
 
 由	<PAD>	浙江	P	<PAD>	NR	成功	15	O
 浙江	由	医科院	NR	P	NN	成功	14	O
@@ -9334,11 +9334,11 @@ F－１８	、	“	NR	PU	PU	超过	28	O
 回扣	例	。	NN	M	PU	成交	9	O
 。	回扣	<PAD>	PU	NN	<PAD>	成交	10	O
 
-上海	<PAD>	海关	NR	<PAD>	NN	成交	27	O
-海关	上海	崇明	NN	NR	NR	成交	26	O
-崇明	海关	办事处	NR	NN	NN	成交	25	O
-办事处	崇明	成立	NN	NR	VV	成交	24	O
-成立	办事处	<PAD>	VV	NN	<PAD>	成交	23	rel
+上海	<PAD>	海关	NR	<PAD>	NN	成立	4	O
+海关	上海	崇明	NN	NR	NR	成立	3	O
+崇明	海关	办事处	NR	NN	NN	成立	2	O
+办事处	崇明	成立	NN	NR	VV	成立	1	O
+成立	办事处	<PAD>	VV	NN	<PAD>	成立	0	rel
 
 五	<PAD>	户	CD	<PAD>	M	成立	13	O
 户	五	被	M	CD	SB	成立	12	O
@@ -12756,11 +12756,11 @@ F－１８	、	“	NR	PU	PU	超过	28	O
 罚	重	。	NN	JJ	PU	出版	28	O
 。	罚	<PAD>	PU	NN	<PAD>	出版	29	O
 
-利物浦	<PAD>	足球队	NR	<PAD>	NN	出版	1	O
-足球队	利物浦	假面	NN	NR	JJ	出版	0	O
-假面	足球队	舞会	JJ	NN	NN	出版	1	O
-舞会	假面	出丑	NN	JJ	VV	出版	2	O
-出丑	舞会	<PAD>	VV	NN	<PAD>	出版	3	rel
+利物浦	<PAD>	足球队	NR	<PAD>	NN	出丑	4	O
+足球队	利物浦	假面	NN	NR	JJ	出丑	3	O
+假面	足球队	舞会	JJ	NN	NN	出丑	2	O
+舞会	假面	出丑	NN	JJ	VV	出丑	1	O
+出丑	舞会	<PAD>	VV	NN	<PAD>	出丑	0	rel
 
 证券法	<PAD>	从	NN	<PAD>	P	出发	5	O
 从	证券法	中国	P	NN	NR	出发	4	O
@@ -15831,18 +15831,18 @@ F－１８	、	“	NR	PU	PU	超过	28	O
 支付	保证	。	NN	VV	PU	存	21	O
 。	支付	<PAD>	PU	NN	<PAD>	存	22	O
 
-国办	<PAD>	发出	NN	<PAD>	VV	存	7	O
-发出	国办	通知	VV	NN	NN	存	6	O
-通知	发出	严禁	NN	VV	VV	存	5	O
-严禁	通知	强令	VV	NN	VV	存	4	O
-强令	严禁	企事业	VV	VV	NN	存	3	O
-企事业	强令	单位	NN	VV	NN	存	2	O
-单位	企事业	在	NN	NN	P	存	1	O
-在	单位	指定	P	NN	VV	存	0	O
-指定	在	金融	VV	P	NN	存	1	O
-金融	指定	机构	NN	VV	NN	存	2	O
-机构	金融	存款	NN	NN	VV	存	3	O
-存款	机构	<PAD>	VV	NN	<PAD>	存	4	rel
+国办	<PAD>	发出	NN	<PAD>	VV	存款	11	O
+发出	国办	通知	VV	NN	NN	存款	10	O
+通知	发出	严禁	NN	VV	VV	存款	9	O
+严禁	通知	强令	VV	NN	VV	存款	8	O
+强令	严禁	企事业	VV	VV	NN	存款	7	O
+企事业	强令	单位	NN	VV	NN	存款	6	O
+单位	企事业	在	NN	NN	P	存款	5	O
+在	单位	指定	P	NN	VV	存款	4	O
+指定	在	金融	VV	P	NN	存款	3	O
+金融	指定	机构	NN	VV	NN	存款	2	O
+机构	金融	存款	NN	NN	VV	存款	1	O
+存款	机构	<PAD>	VV	NN	<PAD>	存款	0	rel
 
 除	<PAD>	国务院	P	<PAD>	NN	存款	24	O
 国务院	除	特殊	NN	P	JJ	存款	23	O
@@ -29099,13 +29099,13 @@ F－１８	、	“	NR	PU	PU	发射	20	O
 项目	贸	。	NN	NN	PU	发展	37	O
 。	项目	<PAD>	PU	NN	<PAD>	发展	38	O
 
-天津	<PAD>	与	NR	<PAD>	CC	发展	34	O
-与	天津	俄罗斯	CC	NR	NR	发展	33	O
-俄罗斯	与	经贸	NR	CC	NN	发展	32	O
-经贸	俄罗斯	关系	NN	NR	NN	发展	31	O
-关系	经贸	稳步	NN	NN	AD	发展	30	O
-稳步	关系	发展	AD	NN	VV	发展	29	O
-发展	稳步	<PAD>	VV	AD	<PAD>	发展	28	rel
+天津	<PAD>	与	NR	<PAD>	CC	发展	6	O
+与	天津	俄罗斯	CC	NR	NR	发展	5	O
+俄罗斯	与	经贸	NR	CC	NN	发展	4	O
+经贸	俄罗斯	关系	NN	NR	NN	发展	3	O
+关系	经贸	稳步	NN	NN	AD	发展	2	O
+稳步	关系	发展	AD	NN	VV	发展	1	O
+发展	稳步	<PAD>	VV	AD	<PAD>	发展	0	rel
 
 为	<PAD>	贯彻	P	<PAD>	VV	发展	6	O
 贯彻	为	、	VV	P	PU	发展	5	O
@@ -54462,17 +54462,17 @@ F－１８	、	“	NR	PU	PU	发射	20	O
 奖杯	冠军	。	NN	NN	PU	举行	21	O
 。	奖杯	<PAD>	PU	NN	<PAD>	举行	22	O
 
-“	<PAD>	国际	PU	<PAD>	NN	举行	4	O
-国际	“	生物	NN	PU	NN	举行	3	O
-生物	国际	多样性	NN	NN	NN	举行	2	O
-多样性	生物	日	NN	NN	NN	举行	1	O
-日	多样性	”	NN	NN	PU	举行	0	O
-”	日	纪念	PU	NN	NN	举行	1	O
-纪念	”	大会	NN	PU	NN	举行	2	O
+“	<PAD>	国际	PU	<PAD>	NN	举行	10	O
+国际	“	生物	NN	PU	NN	举行	9	O
+生物	国际	多样性	NN	NN	NN	举行	8	O
+多样性	生物	日	NN	NN	NN	举行	7	O
+日	多样性	”	NN	NN	PU	举行	6	O
+”	日	纪念	PU	NN	NN	举行	5	O
+纪念	”	大会	NN	PU	NN	举行	4	O
 大会	纪念	在	NN	NN	P	举行	3	O
-在	大会	京	P	NN	NR	举行	4	O
-京	在	举行	NR	P	VV	举行	5	O
-举行	京	<PAD>	VV	NR	<PAD>	举行	6	rel
+在	大会	京	P	NN	NR	举行	2	O
+京	在	举行	NR	P	VV	举行	1	O
+举行	京	<PAD>	VV	NR	<PAD>	举行	0	rel
 
 因此	<PAD>	，	AD	<PAD>	PU	举行	9	O
 ，	因此	复制	PU	AD	VV	举行	8	O
@@ -54893,14 +54893,14 @@ F－１８	、	“	NR	PU	PU	发射	20	O
 形象	运动员	。	NN	NN	PU	举行	69	O
 。	形象	<PAD>	PU	NN	<PAD>	举行	70	O
 
-中	<PAD>	韩	NR	<PAD>	NR	举行	16	O
-韩	中	经贸	NR	NR	NN	举行	15	O
-经贸	韩	研讨会	NN	NR	NN	举行	14	O
-研讨会	经贸	即将	NN	NN	AD	举行	13	O
-即将	研讨会	在	AD	NN	P	举行	12	O
-在	即将	北京	P	AD	NR	举行	11	O
-北京	在	举行	NR	P	VV	举行	10	O
-举行	北京	<PAD>	VV	NR	<PAD>	举行	9	rel
+中	<PAD>	韩	NR	<PAD>	NR	举行	7	O
+韩	中	经贸	NR	NR	NN	举行	6	O
+经贸	韩	研讨会	NN	NR	NN	举行	5	O
+研讨会	经贸	即将	NN	NN	AD	举行	4	O
+即将	研讨会	在	AD	NN	P	举行	3	O
+在	即将	北京	P	AD	NR	举行	2	O
+北京	在	举行	NR	P	VV	举行	1	O
+举行	北京	<PAD>	VV	NR	<PAD>	举行	0	rel
 
 加工	<PAD>	贸易	NN	<PAD>	NN	举足轻重	8	O
 贸易	加工	在	NN	NN	P	举足轻重	7	O
@@ -59191,14 +59191,14 @@ F－１８	、	“	NR	PU	PU	发射	20	O
 半	倍	。	CD	M	PU	看好	43	O
 。	半	<PAD>	PU	CD	<PAD>	看好	44	O
 
-福建	<PAD>	高	NR	<PAD>	JJ	看好	6	O
-高	福建	新	JJ	NR	JJ	看好	5	O
-新	高	技术	JJ	JJ	NN	看好	4	O
-技术	新	产业	NN	JJ	NN	看好	3	O
-产业	技术	发展	NN	NN	NN	看好	2	O
-发展	产业	前景	NN	NN	NN	看好	1	O
-前景	发展	看好	NN	NN	VV	看好	0	O
-看好	前景	<PAD>	VV	NN	<PAD>	看好	1	rel
+福建	<PAD>	高	NR	<PAD>	JJ	看好	7	O
+高	福建	新	JJ	NR	JJ	看好	6	O
+新	高	技术	JJ	JJ	NN	看好	5	O
+技术	新	产业	NN	JJ	NN	看好	4	O
+产业	技术	发展	NN	NN	NN	看好	3	O
+发展	产业	前景	NN	NN	NN	看好	2	O
+前景	发展	看好	NN	NN	VV	看好	1	O
+看好	前景	<PAD>	VV	NN	<PAD>	看好	0	rel
 
 有关	<PAD>	人士	JJ	<PAD>	NN	看好	30	O
 人士	有关	分析	NN	JJ	VV	看好	29	O
@@ -65499,14 +65499,14 @@ F－１８	、	“	NR	PU	PU	发射	20	O
 推翻	被	。	VV	SB	PU	领导	4	O
 。	推翻	<PAD>	PU	VV	<PAD>	领导	5	O
 
-中国	<PAD>	闽	NR	<PAD>	NR	领导	10	O
-闽	中国	东南	NR	NR	NN	领导	9	O
-东南	闽	乡镇	NN	NR	NN	领导	8	O
-乡镇	东南	企业	NN	NN	NN	领导	7	O
-企业	乡镇	发展	NN	NN	NN	领导	6	O
-发展	企业	继续	NN	NN	VV	领导	5	O
-继续	发展	领先	VV	NN	VV	领导	4	O
-领先	继续	<PAD>	VV	VV	<PAD>	领导	3	rel
+中国	<PAD>	闽	NR	<PAD>	NR	领先	7	O
+闽	中国	东南	NR	NR	NN	领先	6	O
+东南	闽	乡镇	NN	NR	NN	领先	5	O
+乡镇	东南	企业	NN	NN	NN	领先	4	O
+企业	乡镇	发展	NN	NN	NN	领先	3	O
+发展	企业	继续	NN	NN	VV	领先	2	O
+继续	发展	领先	VV	NN	VV	领先	1	O
+领先	继续	<PAD>	VV	VV	<PAD>	领先	0	rel
 
 深圳市	<PAD>	沙头角	NR	<PAD>	NR	领先	51	O
 沙头角	深圳市	保税区	NR	NR	NN	领先	50	O
@@ -72234,13 +72234,13 @@ F－１８	、	“	NR	PU	PU	发射	20	O
 形成	初步	。	VV	AD	PU	前所未有	47	O
 。	形成	<PAD>	PU	VV	<PAD>	前所未有	48	O
 
-中国	<PAD>	金融	NR	<PAD>	NN	前所未有	16	O
-金融	中国	对	NN	NR	P	前所未有	15	O
-对	金融	外	P	NN	NN	前所未有	14	O
-外	对	开放	NN	P	NN	前所未有	13	O
-开放	外	稳步	NN	NN	AD	前所未有	12	O
-稳步	开放	前行	AD	NN	VV	前所未有	11	O
-前行	稳步	<PAD>	VV	AD	<PAD>	前所未有	10	rel
+中国	<PAD>	金融	NR	<PAD>	NN	前行	6	O
+金融	中国	对	NN	NR	P	前行	5	O
+对	金融	外	P	NN	NN	前行	4	O
+外	对	开放	NN	P	NN	前行	3	O
+开放	外	稳步	NN	NN	AD	前行	2	O
+稳步	开放	前行	AD	NN	VV	前行	1	O
+前行	稳步	<PAD>	VV	AD	<PAD>	前行	0	rel
 
 阿齐兹	<PAD>	强调	NR	<PAD>	VV	谴责	10	O
 强调	阿齐兹	，	VV	NR	PU	谴责	9	O

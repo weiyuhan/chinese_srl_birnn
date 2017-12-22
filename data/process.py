@@ -24,13 +24,13 @@ def splitFile(filename):
 				sr = tokens[2]
 			else:
 				sr = 'O'
-			'''
+
 			flag, name = sr[:sr.find('-')], sr[sr.find('-')+1:]
 			if flag == 'O' or flag == 'rel':
 				sr = flag
 			else:
 				sr = name
-			'''
+		
 			words.append(word.strip('\n'))
 			poss.append(pos.strip('\n'))
 			srs.append(sr.strip('\n'))
@@ -96,8 +96,5 @@ dev_data = splitFile('cpbdev.txt')
 generateInput(dev_data, 'validation.in')
 test_data = splitFile('cpbtest.txt')
 generateInput(test_data, 'test.in')
-all_data = train_data + test_data + dev_data
-makeDict(all_data, 'srs', 'label2id')
-makeDict(all_data, 'poss', 'pos2id')
 print(max_dis)
 print(min_dis)
