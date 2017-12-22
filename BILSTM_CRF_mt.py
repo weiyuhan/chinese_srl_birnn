@@ -254,7 +254,7 @@ class BILSTM_CRF(object):
                     recall_val, precision_val, f1_val, errors = helper.calc_f1(preds_lines, id2label, 'cpbdev.txt', 'validation.out')
                     if f1_val > self.max_f1:
                         self.max_f1 = f1_val
-                        save_path = saver.save(sess, save_file + '/model.ckpt', global_step=iteration)
+                        save_path = saver.save(sess, save_file)
                         helper.calc_f1(preds_lines, id2label, 'cpbdev.txt', 'validation.out.best')
                         print "saved the best model with f1: %.5f" % (self.max_f1)
                     print "valid precision: %.5f, valid recall: %.5f, valid f1: %.5f, errors: %5d" % (precision_val, recall_val, f1_val, errors)

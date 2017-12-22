@@ -69,7 +69,12 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, model_path)
         #test
         print "testing"
-        model.test(sess, test_data, output_path)
+        results = model.test(sess, test_data, output_path)
+
+        outputFile = open(output_path, 'w')
+        for line in results:
+            outputFile.write(' '.join(line) + '\n')
+        outputFile.close()
 
         end_time = time.time()
         print "time used %f(hour)" % ((end_time - start_time) / 3600)
