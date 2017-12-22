@@ -24,13 +24,13 @@ def splitFile(filename):
 				sr = tokens[2]
 			else:
 				sr = 'O'
-
+			'''
 			flag, name = sr[:sr.find('-')], sr[sr.find('-')+1:]
 			if flag == 'O' or flag == 'rel':
 				sr = flag
 			else:
 				sr = name
-		
+			'''
 			words.append(word.strip('\n'))
 			poss.append(pos.strip('\n'))
 			srs.append(sr.strip('\n'))
